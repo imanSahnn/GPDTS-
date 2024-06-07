@@ -1,4 +1,4 @@
-@extends('student.layout')
+@extends('layout.app')
 
 @section('title', 'Course List')
 
@@ -32,11 +32,15 @@
             <p class="text-gray-600 mb-2">Price: ${{ $course->price }}</p>
             <p class="text-gray-600 mb-2">Minimum Hours: {{ $course->min_hours }}</p>
             <p class="text-gray-600 mb-4">{{ $course->detail }}</p>
+            @if(!in_array($course->id, $userCourses))
             <form action="{{ route('choose_course') }}" method="POST" onsubmit="return confirmChooseCourse()">
                 @csrf
                 <input type="hidden" name="course_id" value="{{ $course->id }}">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Choose</button>
             </form>
+            @else
+            <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg cursor-not-allowed" disabled>Already Chosen</button>
+            @endif
         </div>
         @endforeach
     </div>

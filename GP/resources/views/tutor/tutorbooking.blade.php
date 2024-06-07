@@ -142,7 +142,7 @@
                 <tbody>
                     @foreach ($bookings as $booking)
                         <tr>
-                            <td><a href="{{ route('studentdetail', ['id' => $booking->student->id]) }}">{{ $booking->student->name }}</a></td>
+                            <td><a href="{{ route('studentdetail', ['id' => $booking->student->id, 'bookingId' => $booking->id]) }}">{{ $booking->student->name }}</a></td>
                             <td>{{ $booking->date }}</td>
                             <td>{{ $booking->time }}</td>
                             <td>{{ $booking->status }}</td>

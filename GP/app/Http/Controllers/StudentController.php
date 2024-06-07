@@ -134,27 +134,25 @@ class StudentController extends Controller
     }
     public function showTutorList()
     {
-        $user = Auth::guard('student')->user();
-        $selectedTutor = Tutor::find($user->selected_tutor_id);
-        $profilePicture = Student::where('id', $user->id)->value('picture');
-        if ($selectedTutor) {
-            $tutors = collect([$selectedTutor]);
-        } else {
-            $tutors = Tutor::where('status', 'active')
-                           ->whereHas('course', function($query) use ($user) {
-                               $query->where('id', $user->course_id);
-                           })
-                           ->get();
+        $student = Auth::guard('student')->user();
+        $courseIds = $student->courses()->pluck('course.id');
+        $tutors = Tutor::whereIn('course_id', $courseIds)->with('course')->orderBy('created_at', 'desc')->get();
+
+        foreach ($tutors as $tutor) {
+            $tutor->average_rating = $tutor->ratings()->avg('rate'); // Calculate average rate
         }
 
-        return view('student.tutorlist', compact('tutors', 'selectedTutor','profilePicture'));
+        return view('student.tutorlist', compact('tutors'));
     }
+
+
     public function courselist()
     {
         $user = Auth::guard('student')->user();
         $profilePicture = Student::where('id', $user->id)->value('picture');
         $courses = Course::all();
-        return view('student.course_list', compact('courses','profilePicture'));
+        $userCourses = $user->courses->pluck('id')->toArray(); // Get IDs of courses the user has already chosen
+        return view('student.course_list', compact('courses', 'profilePicture', 'userCourses'));
     }
 
     public function chooseCourse(Request $request)
@@ -190,6 +188,15 @@ class StudentController extends Controller
             return back()->withErrors(['message' => 'Failed to add course: ' . $e->getMessage()]);
         }
     }
+    public function showLearningProgress()
+    {
+        $student = Auth::guard('student')->user();
+        $courses = $student->courses()->with('skills')->get();
+        $skillsProgress = StudentCourseSkill::where('student_id', $student->id)->with('skill')->get();
+
+        return view('student.learning_progress', compact('courses', 'skillsProgress'));
+    }
+
 
 }
 

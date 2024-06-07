@@ -8,38 +8,39 @@ use App\Models\Student;
 use App\Models\Booking;
 use App\Models\StudentCourseSkill;
 use App\Models\Course;
+use App\Models\Rating;
 use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
     public function showBookingForm()
-    {
-        $user = Auth::guard('student')->user();
-        $profilePicture = $user->picture;
-        $selectedTutorId = $user->selected_tutor_id;
-        $hasTutor = !is_null($selectedTutorId);
+{
+    $user = Auth::guard('student')->user();
+    $profilePicture = $user->picture;
+    $selectedTutorId = $user->selected_tutor_id;
+    $hasTutor = !is_null($selectedTutorId);
 
-        // Ensure $chosenCourses is correctly set
-        $chosenCourses = $user->courses;
+    // Ensure $chosenCourses is correctly set and remove duplicates
+    $chosenCourses = $user->courses->unique('id');
 
-        if ($hasTutor) {
-            $tutors = Tutor::where('id', $selectedTutorId)->get();
-        } else {
-            $tutors = Tutor::where('status', 'active')
-                           ->whereHas('course', function($query) use ($user) {
-                               $query->whereIn('id', $user->courses->pluck('id'));
-                           })
-                           ->get();
-        }
-
-        $bookings = Booking::where('student_id', $user->id)
-                           ->orderByRaw("FIELD(status, 'approved', 'pending', 'rejected')")
-                           ->with('tutor', 'course')
-                           ->get();
-
-        // Pass $chosenCourses to the view
-        return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses'));
+    if ($hasTutor) {
+        $tutors = Tutor::where('id', $selectedTutorId)->get();
+    } else {
+        $tutors = Tutor::where('status', 'active')
+                       ->whereHas('course', function($query) use ($user) {
+                           $query->whereIn('id', $user->courses->pluck('id')->unique());
+                       })
+                       ->get();
     }
+
+    $bookings = Booking::where('student_id', $user->id)
+                       ->orderByRaw("FIELD(status, 'approved', 'pending', 'rejected')")
+                       ->with('tutor', 'course')
+                       ->get();
+
+    // Pass $chosenCourses to the view
+    return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses'));
+}
 
     public function chooseTutor(Request $request)
     {
@@ -84,11 +85,13 @@ class BookingController extends Controller
         $request->validate([
             'date' => 'required|date|after_or_equal:today',
             'time' => 'required|in:08:30,10:00,11:30,14:00,15:30',
-            'tutor_id' => 'required|exists:tutor,id',
+            'tutor_id' => 'required|exists:tutor,id', // Adjusted to match your table name
+            'course_id' => 'required|exists:course,id', // New validation rule for course_id
         ]);
 
         $user = Auth::guard('student')->user();
         $selectedTutorId = $request->tutor_id;
+        $courseId = $request->course_id;
 
         // Check if there is any existing booking for the selected date and time
         $existingBooking = Booking::where('tutor_id', $selectedTutorId)
@@ -105,6 +108,7 @@ class BookingController extends Controller
         Booking::create([
             'student_id' => $user->id,
             'tutor_id' => $selectedTutorId,
+            'course_id' => $courseId, // Include course_id in the booking
             'date' => $request->date,
             'time' => $request->time,
             'status' => 'pending',
@@ -184,23 +188,25 @@ class BookingController extends Controller
     }
 
 
-    public function showStudent($id)
+    public function showStudent($id, $bookingId)
     {
         $tutor = Auth::guard('tutor')->user();
         $student = Student::with(['courses.skills'])->findOrFail($id);
         $bookings = Booking::where('student_id', $id)->where('tutor_id', $tutor->id)->get();
 
-        // Fetch the latest booking
-        $latestBooking = $bookings->sortByDesc('date')->first();
+        // Fetch the specific booking
+        $selectedBooking = Booking::findOrFail($bookingId);
+
+        // Fetch all bookings for the student and tutor
+        $allBookings = $bookings->sortByDesc('date');
 
         // Fetch skills from student_course_skill table related to the tutor's course
         $skillsProgress = StudentCourseSkill::where('student_id', $id)
                                             ->where('course_id', $tutor->course_id)
                                             ->get();
 
-        return view('tutor.studentdetail', compact('student', 'latestBooking', 'skillsProgress'));
+        return view('tutor.studentdetail', compact('student', 'allBookings', 'skillsProgress', 'selectedBooking'));
     }
-
     public function updateBooking(Request $request, $id)
     {
         $request->validate([
@@ -216,4 +222,24 @@ class BookingController extends Controller
         return redirect()->route('studentdetail', ['id' => $booking->student_id])->with('success', 'Booking updated successfully.');
     }
 
+    public function submitReview(Request $request, $id)
+    {
+        $request->validate([
+            'rate' => 'required|integer|between:1,5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        $booking = Booking::findOrFail($id);
+        $student = Auth::guard('student')->user();
+
+        Rating::create([
+            'student_id' => $student->id,
+            'tutor_id' => $booking->tutor_id,
+            'course_id' => $booking->course_id,
+            'rate' => $request->rate,
+            'comment' => $request->comment,
+        ]);
+
+        return redirect()->back()->with('success', 'Review submitted successfully.');
+    }
 }

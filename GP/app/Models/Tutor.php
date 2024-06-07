@@ -24,9 +24,9 @@ class Tutor extends Authenticatable
         return $this->hasMany(Booking::class);
     }
 
-    public function reviews()
+    public function ratings()
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Rating::class);
     }
 
     protected $hidden = [

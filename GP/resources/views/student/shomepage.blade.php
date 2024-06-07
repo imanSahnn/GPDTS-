@@ -4,7 +4,7 @@
     <title>Homepage</title>
 </head>
 <body>
-    @extends('student.layout')
+    @extends('layout.app')
 
     @section('title', 'Homepage')
 

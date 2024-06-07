@@ -1,6 +1,6 @@
 <!-- resources/views/courses.blade.php -->
 
-@extends('student.layout')
+@extends('layout.app')
 
 @section('content')
 <div class="container">

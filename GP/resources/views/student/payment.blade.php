@@ -1,4 +1,4 @@
-@extends('student.layout')
+@extends('layout.app')
 
 @section('title', 'Payment')
 
@@ -49,6 +49,7 @@
             <form action="{{ route('submit_payment') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="course_id" id="selectedCourseId">
+                <input type="hidden" id="coursePrice"> <!-- Hidden input for course price -->
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
                     <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="{{ $student->name }}" readonly>
@@ -67,10 +68,10 @@
                 </div>
                 <div class="mb-4">
                     <label for="payment_proof" class="block text-gray-700 text-sm font-bold mb-2">Upload Payment Proof:</label>
-                    <input type="file" name="payment_proof" id="payment_proof" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <input type="file" name="payment_proof" id="payment_proof" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" accept=".jpeg,.png,.jpg,.gif,.pdf" required>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit Payment</button>
+                    <button type="submit" id="submitPaymentBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit Payment</button>
                 </div>
             </form>
         </div>
@@ -86,6 +87,19 @@
             document.getElementById('totalPaid').innerText = paid ? `$${paid}` : '-';
 
             document.getElementById('selectedCourseId').value = this.value;
+            document.getElementById('coursePrice').value = price;
+
+            toggleSubmitButton(price, paid);
         });
+
+        function toggleSubmitButton(price, paid) {
+            const submitButton = document.getElementById('submitPaymentBtn');
+            if (price && paid && parseFloat(price) === parseFloat(paid)) {
+                submitButton.style.display = 'none';
+            } else {
+                submitButton.style.display = 'block';
+            }
+        }
     </script>
+</div>
 @endsection

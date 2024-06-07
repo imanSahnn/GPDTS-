@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Booking extends Model
+class Rating extends Model
 {
     use HasFactory;
 
@@ -13,21 +13,18 @@ class Booking extends Model
         'student_id',
         'tutor_id',
         'course_id',
-        'date',
-        'time',
-        'status',
-        'attendance_status',
-        'comment'
+        'rate',
+        'comment',
     ];
-
-    public function tutor()
-    {
-        return $this->belongsTo(Tutor::class);
-    }
 
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function tutor()
+    {
+        return $this->belongsTo(Tutor::class);
     }
 
     public function course()

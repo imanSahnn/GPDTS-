@@ -20,9 +20,9 @@ class PaymentController extends Controller
     public function submitPayment(Request $request)
     {
         $request->validate([
-            'course_id' => 'required|exists:course,id',
+            'course_id' => 'required|exists:course,id', // Correct the table name to match your database schema
             'total_payment' => 'required|numeric',
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'payment_proof' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048', // Include PDF in the validation
         ]);
 
         $student = Auth::guard('student')->user();
@@ -48,7 +48,9 @@ class PaymentController extends Controller
 
     public function showConfirmPayment()
     {
-        $payments = Payment::where('status', 'pending')->latest()->get();
+        $payments = Payment::with(['student', 'course'])
+        ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
+        ->get();
         return view('admin.confirmpayment', compact('payments'));
     }
 
@@ -60,4 +62,13 @@ class PaymentController extends Controller
 
         return redirect()->back()->with('success', 'Payment approved successfully.');
     }
+
+    public function rejectPayment($id)
+{
+    $payment = Payment::findOrFail($id);
+    $payment->status = 'rejected';
+    $payment->save();
+
+    return redirect()->back()->with('success', 'Payment rejected successfully.');
+}
 }

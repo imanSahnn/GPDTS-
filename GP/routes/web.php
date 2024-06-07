@@ -52,7 +52,7 @@ Route::post('/tutor/register', [AuthController::class,'tregisterPost'])->name('t
 // Route to show the list of students for a specific tutor
 Route::get('/tutor/students', [TutorController::class, 'listStudents'])->name('tutor.students');
 // Route to show the details of a specific student
-Route::get('/student/{id}', [BookingController::class, 'showstudent'])->name('studentdetail');
+Route::get('/tutor/student/{id}', [TutorController::class, 'showStudent'])->name('tutor.showStudent');
 
 
 Route::get('/admin/createtutor', [TutorController::class, 'create'])->name('admin.createtutor');
@@ -67,7 +67,7 @@ Route::get('admin/tutors', [TutorController::class, 'index'])->name('tutors.inde
 
     Route::get('/tutor/bookings', [BookingController::class, 'showTutorBookings'])->name('tutor_bookings');
     Route::post('/tutor/bookings/{id}/status', [TutorController::class, 'changeStatus'])->name('tutor.changeStatus');
-    Route::get('/student/{id}', [BookingController::class, 'showStudent'])->name('studentdetail');
+    Route::get('/student/{id}/{bookingId}', [BookingController::class, 'showStudent'])->name('studentdetail');
     Route::post('/tutor/update-booking/{id}', [BookingController::class, 'updateBooking'])->name('update_booking');
     Route::post('/tutor/change-booking-status/{id}', [BookingController::class, 'changeBookingStatus'])->name('change_booking_status');
 
@@ -78,8 +78,9 @@ Route::post('/admin/tutors/reject/{id}', [TutorController::class, 'rejectTutor']
 
 
 //learning-progress
+Route::post('/tutor/skills/update', [LearningProgressController::class, 'updateAllSkills'])->name('update_all_skills');
 Route::post('/update-skill-status/{id}', [LearningProgressController::class, 'updateSkillStatus'])->name('update_skill_status');
-
+Route::get('/learning-progress', [LearningProgressController::class, 'showStudentProgress'])->name('learning_progress');
 
 //student
 Route::get('/sregister', [AuthController::class, 'sregister'])->name('sregister'); //untuk get the data from field
@@ -118,7 +119,7 @@ Route::group(['middleware' => ['auth:student']], function () {
     Route::delete('/delete-booking/{id}', [BookingController::class, 'deleteBooking'])->name('delete_booking');
 });
 
-
+Route::get('/student/tutor-list', [StudentController::class, 'showTutorList'])->name('student.tutor_list');
 
 //course
 Route::get('/admin/createcourse', [CourseController::class, 'create'])->name('admin.createcourse');
@@ -140,3 +141,7 @@ Route::delete('/admin/destroy/{course}', [CourseController::class, 'destroy'])->
 
     Route::get('/confirm-payment', [PaymentController::class, 'showConfirmPayment'])->name('show_confirm_payment');
     Route::patch('/approve-payment/{id}', [PaymentController::class, 'approvePayment'])->name('admin.approve_payment');
+    Route::patch('/reject-payment/{id}', [PaymentController::class, 'rejectPayment'])->name('admin.reject_payment');
+
+    //rating
+    Route::post('/submit-review/{id}', [BookingController::class, 'submitReview'])->name('submit_review');
