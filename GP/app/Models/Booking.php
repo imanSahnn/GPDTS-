@@ -34,4 +34,8 @@ class Booking extends Model
     {
         return $this->belongsTo(Course::class);
     }
+    public function skill()
+    {
+        return $this->belongsTo(Skill::class);
+    }
 }

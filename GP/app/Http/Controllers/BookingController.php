@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
+
+use Carbon\Carbon;
+
 use Illuminate\Http\Request;
 use App\Models\Tutor;
 use App\Models\Student;
@@ -23,6 +27,13 @@ class BookingController extends Controller
         // Ensure $chosenCourses is correctly set and remove duplicates
         $chosenCourses = $user->courses->unique('id');
 
+        // Calculate if each course meets the 15% payment requirement
+        $coursePaymentStatus = [];
+        foreach ($chosenCourses as $course) {
+            $totalPaid = $user->payments()->where('course_id', $course->id)->where('status', 'approved')->sum('total_payment');
+            $coursePaymentStatus[$course->id] = $totalPaid >= 0.15 * $course->price;
+        }
+
         if ($hasTutor) {
             $tutors = Tutor::where('id', $selectedTutorId)->get();
         } else {
@@ -38,8 +49,8 @@ class BookingController extends Controller
                            ->with('tutor', 'course')
                            ->get();
 
-        // Pass $chosenCourses to the view
-        return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses'));
+        // Pass $coursePaymentStatus to the view
+        return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses', 'coursePaymentStatus'));
     }
 
     public function chooseTutor(Request $request)
@@ -79,38 +90,38 @@ class BookingController extends Controller
     public function bookClass(Request $request)
     {
         $request->validate([
-            'date' => 'required|date|after_or_equal:today',
-            'time' => 'required|in:08:30,10:00,11:30,14:00,15:30',
             'tutor_id' => 'required|exists:tutor,id',
             'course_id' => 'required|exists:course,id',
+            'date' => 'required|date',
+            'time' => 'required',
         ]);
 
-        $user = Auth::guard('student')->user();
-        $selectedTutorId = $request->tutor_id;
-        $courseId = $request->course_id;
+        $studentId = auth()->guard('student')->id();
+        $date = Carbon::parse($request->input('date'))->format('Y-m-d');
+        $time = $request->input('time');
 
-        // Check if there is any existing booking for the selected date and time
-        $existingBooking = Booking::where('tutor_id', $selectedTutorId)
-                                  ->where('date', $request->date)
-                                  ->where('time', $request->time)
-                                  ->first();
+        // Check for existing bookings with the same date and time
+        $existingBooking = Booking::where('student_id', $studentId)
+                                  ->where('date', $date)
+                                  ->where('time', $time)
+                                  ->whereIn('status', ['pending', 'approved'])
+                                  ->exists();
 
-        // If there's an existing booking and its status is not rejected, return error
-        if ($existingBooking && $existingBooking->status != 'rejected') {
-            return redirect()->route('bookings')->with('error', 'The selected time slot is already booked.');
+        if ($existingBooking) {
+            return redirect()->back()->with('error', 'You already have a booking for this date and time.');
         }
 
-        // Create new booking
+        // Create the new booking
         Booking::create([
-            'student_id' => $user->id,
-            'tutor_id' => $selectedTutorId,
-            'course_id' => $courseId,
-            'date' => $request->date,
-            'time' => $request->time,
+            'student_id' => $studentId,
+            'tutor_id' => $request->input('tutor_id'),
+            'course_id' => $request->input('course_id'),
+            'date' => $date,
+            'time' => $time,
             'status' => 'pending',
         ]);
 
-        return redirect()->route('bookings')->with('success', 'Class booked successfully!');
+        return redirect()->back()->with('success', 'Booking created successfully. Awaiting approval.');
     }
 
     public function editBooking(Request $request, $bookingId)

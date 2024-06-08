@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
+        /* Your custom styles here */
         .status-approved {
             background-color: #d4edda;
             color: #155724;
@@ -28,6 +29,7 @@
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
+
         .ui-datepicker-header {
             background: #164863;
             color: #ffffff;
@@ -35,9 +37,11 @@
             padding: 10px;
             border-radius: 8px 8px 0 0;
         }
+
         .ui-datepicker-title {
             font-weight: bold;
         }
+
         .ui-state-default {
             border: 1px solid #ddd;
             background: #f9f9f9;
@@ -46,11 +50,13 @@
             padding: 5px;
             transition: background-color 0.3s, color 0.3s;
         }
+
         .ui-state-hover,
         .ui-state-active {
             background: #164863;
             color: #ffffff;
         }
+
         .ui-datepicker-calendar td a {
             text-align: center;
             display: block;
@@ -65,7 +71,6 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0, 0, 0);
             background-color: rgba(0, 0, 0, 0.4);
             padding-top: 60px;
         }
@@ -76,6 +81,7 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
+            max-width: 600px; /* Limit the maximum width */
         }
 
         .close {
@@ -89,15 +95,18 @@
         .close:focus {
             color: black;
             text-decoration: none;
-            cursor: pointer;
+            cursor: grab;
         }
 
-        .content-box {
-            border: 1px solid #ccc;
+        .conten-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding-top: 60px; /* Increase the top padding */
+            padding-bottom: 60px; /* Increase the bottom padding */
             border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            background-color: #f9f9f9;
+            box-shadow: 0 10px 20px rgba(152, 22, 22, 0.2);
+            width: 90%; /* Set a wider width */
+            min-width: 320px; /* Limit the minimum width */
+            margin: auto; /* Center the box horizontally */
         }
 
         .tutor-card {
@@ -116,6 +125,25 @@
             width: 50px;
             height: 50px;
         }
+
+        /* Responsive classes */
+        @media (min-width: 640px) {
+            .conten-box {
+                width: 80%; /* Adjust width for medium screens */
+            }
+        }
+
+        @media (min-width: 768px) {
+            .conten-box {
+                width: 70%; /* Adjust width for large screens */
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .conten-box {
+                width: 60%; /* Adjust width for extra-large screens */
+            }
+        }
     </style>
 </head>
 <body>
@@ -126,7 +154,7 @@
 <div>
     @include('student.sidebar')
 </div>
-<div class="content-box">
+<div class="conten-box">
     @if(session('success'))
         <div class="bg-green-500 text-white p-4 rounded mb-4">
             {{ session('success') }}
@@ -139,15 +167,21 @@
     @endif
 
     <div class="bg-blue pl-7 pr-7">
+        <h2 class="text-2xl font-bold text-center mb-4">Fill in the Details</h2>
         <form action="{{ route('fetch_available_tutors') }}" method="POST" class="bg-white p-6 rounded shadow mb-4 ml-4">
             @csrf
+
             <div class="flex flex-wrap -mx-3 mb-4">
                 <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                     <label for="course" class="block text-gray-700 font-bold mb-2">Course</label>
                     <select id="course" name="course_id" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
                         <option value="">Select a Course</option>
                         @foreach($chosenCourses as $course)
-                            <option value="{{ $course->id }}">{{ $course->name }}</option>
+                            @if($coursePaymentStatus[$course->id])
+                                <option value="{{ $course->id }}">{{ $course->name }}</option>
+                            @else
+                                <option value="{{ $course->id }}" disabled>{{ $course->name }} (Minimum 15% payment required)</option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
@@ -174,9 +208,9 @@
     </div>
 
     @if(session('availableTutors'))
-    <div class="mt-7 pl-7 pr-7">
+    <div class="mt-7 pl-7 pr-7 ">
         <h2 class="text-2xl font-bold text-center mb-4">Available Tutors</h2>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto ">
             <table id="tutorsTable" class="min-w-full bg-white">
                 <thead>
                     <tr>
@@ -226,7 +260,7 @@
             </select>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="bg-white p-6 rounded shadow mb-4 ml-4">
             <table id="bookingsTable" class="min-w-full bg-white">
                 <thead>
                     <tr>
@@ -245,7 +279,7 @@
                             <td class="py-2 px-4 border-b border-gray-200">{{ $booking->time }}</td>
                             <td class="py-2 px-4 border-b border-gray-200">{{ ucfirst($booking->status) }}</td>
                             <td class="py-2 px-4 border-b border-gray-200">
-                                @if(\Carbon\Carbon::now()->lt(\Carbon\Carbon::parse($booking->date)))
+                                @if(\Carbon\Carbon::now()->lt(\Carbon\Carbon::parse($booking->date)) && $booking->status !== 'rejected')
                                     <button type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded" onclick="editBooking({{ $booking->id }}, '{{ $booking->date }}', '{{ $booking->time }}')">Edit</button>
                                     <button type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" onclick="confirmDelete({{ $booking->id }})">Delete</button>
                                 @endif
@@ -296,11 +330,15 @@
         <span class="close" onclick="closeModal('deleteBookingModal')">&times;</span>
         <h2 class="text-lg leading-6 font-medium text-gray-900">Confirm Deletion</h2>
         <p class="text-gray-700 mt-2">Are you sure you want to delete this booking?</p>
-        <input type="hidden" id="deleteBookingId" value="">
-        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-            <button id="confirmDeleteBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="confirmDelete()">Delete</button>
-            <button type="button" class="mt-3 sm:mt-0 sm:ml-3 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="closeModal('deleteBookingModal')">Cancel</button>
-        </div>
+        <form id="deleteBookingForm" method="POST" action="">
+            @csrf
+            @method('DELETE')
+            <input type="hidden" id="deleteBookingId" name="id" value="">
+            <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Delete</button>
+                <button type="button" class="mt-3 sm:mt-0 sm:ml-3 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="closeModal('deleteBookingModal')">Cancel</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -365,30 +403,14 @@
     }
 
     function confirmDelete(id) {
-        $('#deleteBookingId').val(id);
-        $('#deleteBookingModal').show();
-    }
+    $('#deleteBookingId').val(id);
+    $('#deleteBookingForm').attr('action', '/delete-booking/' + id);
+    $('#deleteBookingModal').show();
+}
 
-    function confirmDelete() {
-        var id = $('#deleteBookingId').val();
-        $.ajax({
-            url: '/delete-booking/' + id,
-            type: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(result) {
-                // Show a success message
-                alert('Booking deleted successfully!');
-                // Refresh the page
-                location.reload();
-            },
-            error: function(result) {
-                // Show an error message
-                alert('Error deleting booking!');
-            }
-        });
-    }
+function closeModal(modalId) {
+    $('#' + modalId).hide();
+}
 
     function reviewBooking(id, tutorName, tutorPicture, date, time) {
         $('#tutorName').text(tutorName);

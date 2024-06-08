@@ -38,6 +38,24 @@ class Student extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function getCurrentTotalAttribute()
+    {
+        return $this->payments()->where('status', 'approved')->sum('total_payment');
+    }
+    public function hasPaidMinimum($courseId)
+    {
+        $course = Course::find($courseId);
+        if ($course) {
+            $currentTotal = $this->payments()->where('course_id', $courseId)->where('status', 'approved')->sum('total_payment');
+            return $currentTotal >= 0.15 * $course->price;
+        }
+        return false;
+    }
 
     protected $hidden = [
         'password', 'remember_token',
