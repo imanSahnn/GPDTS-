@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class TutorController extends Controller
@@ -216,5 +217,44 @@ class TutorController extends Controller
         $booking->save();
 
         return redirect()->back()->with('success', 'Booking status updated successfully.');
+    }
+    public function showTutorProfile()
+    {
+        $tutor = Auth::guard('tutor')->user();
+        return view('tutor.tutorprofile', compact('tutor'));
+    }
+
+    public function updateTutorProfile(Request $request)
+    {
+        $tutor = Auth::guard('tutor')->user();
+
+        $request->validate([
+            'number' => 'required|string|max:15',
+            'email' => 'required|email|max:255|unique:tutor,email,' . $tutor->id,
+            'password' => 'nullable|string|min:6|confirmed',
+            'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $tutor->number = $request->number;
+        $tutor->email = $request->email;
+
+        if ($request->password) {
+            $tutor->password = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('picture')) {
+            // Delete the old picture if it exists
+            if ($tutor->picture) {
+                Storage::disk('public')->delete($tutor->picture);
+            }
+
+            // Store the new picture
+            $picturePath = $request->file('picture')->store('profile_pictures', 'public');
+            $tutor->picture = $picturePath;
+        }
+
+        $tutor->save();
+
+        return redirect()->route('tutor.tutorprofile')->with('success', 'Profile updated successfully.');
     }
 }

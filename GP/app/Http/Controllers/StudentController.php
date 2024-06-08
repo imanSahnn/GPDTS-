@@ -9,6 +9,7 @@ use App\Models\Tutor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Models\StudentCourseSkill;
@@ -195,6 +196,46 @@ class StudentController extends Controller
         $skillsProgress = StudentCourseSkill::where('student_id', $student->id)->with('skill')->get();
 
         return view('student.learning_progress', compact('courses', 'skillsProgress'));
+    }
+
+    public function showProfile()
+    {
+        $student = Auth::guard('student')->user();
+        return view('student.studentprofile', compact('student'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $student = Auth::guard('student')->user();
+
+        $request->validate([
+            'number' => 'required|string|max:15' ,
+            'email' => 'required|email|max:255|unique:students,email,' . $student->id,
+            'password' => 'nullable|string|min:6|confirmed',
+            'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $student->number = $request->number;
+        $student->email = $request->email;
+
+        if ($request->password) {
+            $student->password = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('picture')) {
+            // Delete the old picture if it exists
+            if ($student->picture) {
+                Storage::disk('public')->delete($student->picture);
+            }
+
+            // Store the new picture
+            $picturePath = $request->file('picture')->store('profile_pictures', 'public');
+            $student->picture = $picturePath;
+        }
+
+        $student->save();
+
+        return redirect()->route('student.profile')->with('success', 'Profile updated successfully.');
     }
 
 

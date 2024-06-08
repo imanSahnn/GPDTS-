@@ -15,7 +15,7 @@ class LearningProgressController extends Controller
     public function enroll(Request $request)
     {
         $request->validate([
-            'course_id' => 'required|exists:course,id',
+            'course_id' => 'required|exists:courses,id',
         ]);
 
         $student = Auth::guard('student')->user();
@@ -51,7 +51,6 @@ class LearningProgressController extends Controller
         return view('student.progress', compact('course', 'progress'));
     }
 
-
     public function updateAllSkills(Request $request)
     {
         $request->validate([
@@ -81,10 +80,10 @@ class LearningProgressController extends Controller
             ->whereNotNull('comment')
             ->orderBy('date', 'desc')
             ->orderBy('time', 'desc')
-            ->with('course') // Ensure the course relationship is loaded
+            ->with(['course', 'skill']) // Ensure the course relationship is loaded
             ->get();
 
-        // Handle bookings with missing course_id or course_id = 0
+        // Map course names to bookings
         $allBookings->each(function ($booking) {
             $booking->course_name = $booking->course ? $booking->course->name : 'N/A';
         });
@@ -92,3 +91,4 @@ class LearningProgressController extends Controller
         return view('student.learning_progress', compact('courses', 'skillsProgress', 'allBookings'));
     }
 }
+

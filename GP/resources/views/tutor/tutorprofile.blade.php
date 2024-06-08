@@ -1,5 +1,5 @@
-<!-- studentprofile.blade.php -->
-@extends('layout.app')
+<!-- tutorprofile.blade.php -->
+@extends('tutor.layout')
 
 @section('title', 'Profile')
 
@@ -13,28 +13,28 @@
         </div>
     @endif
 
-    <form action="{{ route('student.profile.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('tutor.profile.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="bg-white p-6 rounded shadow mb-4">
             <div class="mb-4">
                 <label class="block text-gray-700 font-bold mb-2" for="name">Name:</label>
-                <input type="text" id="name" name="name" value="{{ $student->name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" disabled>
+                <input type="text" id="name" name="name" value="{{ $tutor->name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" disabled>
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 font-bold mb-2" for="ic">IC:</label>
-                <input type="text" id="ic" name="ic" value="{{ $student->ic }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" disabled>
+                <input type="text" id="ic" name="ic" value="{{ $tutor->ic }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" disabled>
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 font-bold mb-2" for="number">Phone Number:</label>
-                <input type="text" id="number" name="number" value="{{ $student->number }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <input type="text" id="number" name="number" value="{{ $tutor->number }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 font-bold mb-2" for="email">Email:</label>
-                <input type="email" id="email" name="email" value="{{ $student->email }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <input type="email" id="email" name="email" value="{{ $tutor->email }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
 
             <div class="mb-4">
@@ -52,21 +52,12 @@
                 <input type="file" id="picture" name="picture" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
 
-            @if($student->picture)
+            @if($tutor->picture)
                 <div class="mb-4">
                     <label class="block text-gray-700 font-bold mb-2">Current Picture:</label>
-                    <img src="{{ asset('storage/' . $student->picture) }}" alt="Profile Picture" class="rounded-full w-32 h-32">
+                    <img src="{{ asset('storage/' . $tutor->picture) }}" alt="Profile Picture" class="rounded-full w-32 h-32">
                 </div>
             @endif
-
-            <div class="mb-4">
-                <label class="block text-gray-700 font-bold mb-2">Courses:</label>
-                <ul>
-                    @foreach($student->courses as $course)
-                        <li>{{ $course->name }}</li>
-                    @endforeach
-                </ul>
-            </div>
 
             <div class="flex items-center justify-between">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Changes</button>

@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
-
 use Carbon\Carbon;
-
 use Illuminate\Http\Request;
 use App\Models\Tutor;
 use App\Models\Student;
@@ -203,20 +200,18 @@ class BookingController extends Controller
     {
         $tutor = Auth::guard('tutor')->user();
         $student = Student::with(['courses.skills'])->findOrFail($id);
-        $bookings = Booking::where('student_id', $id)->where('tutor_id', $tutor->id)->get();
-
-        // Fetch the specific booking
-        $selectedBooking = Booking::findOrFail($bookingId);
-
-        // Fetch all bookings for the student and tutor
-        $allBookings = $bookings->sortByDesc('date');
+        $selectedBooking = Booking::where('id', $bookingId)
+                                   ->where('student_id', $id)
+                                   ->where('tutor_id', $tutor->id)
+                                   ->with('course')
+                                   ->firstOrFail();
 
         // Fetch skills from student_course_skill table related to the tutor's course
         $skillsProgress = StudentCourseSkill::where('student_id', $id)
-                                            ->where('course_id', $tutor->course_id)
+                                            ->where('course_id', $selectedBooking->course_id)
                                             ->get();
 
-        return view('tutor.studentdetail', compact('student', 'allBookings', 'skillsProgress', 'selectedBooking'));
+        return view('tutor.studentdetail', compact('student', 'skillsProgress', 'selectedBooking'));
     }
 
     public function updateBooking(Request $request, $id)

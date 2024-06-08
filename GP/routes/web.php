@@ -76,7 +76,10 @@ Route::get('admin/tutors', [TutorController::class, 'index'])->name('tutors.inde
 Route::get('/admin/tutors/pending', [TutorController::class, 'pendingTutors'])->name('pendingTutors');
 Route::post('/admin/tutors/approve/{id}', [TutorController::class, 'approveTutor'])->name('admin.approveTutor');
 Route::post('/admin/tutors/reject/{id}', [TutorController::class, 'rejectTutor'])->name('admin.rejectTutor');
-
+Route::group(['middleware' => ['auth:tutor']], function () {
+    Route::get('/tutor/profile', [TutorController::class, 'showTutorProfile'])->name('tutor.profile');
+    Route::post('/tutor/profile', [TutorController::class, 'updateTutorProfile'])->name('tutor.profile.update');
+});
 
 //learning-progress
 Route::post('/tutor/skills/update', [LearningProgressController::class, 'updateAllSkills'])->name('update_all_skills');
@@ -85,7 +88,10 @@ Route::get('/learning-progress', [LearningProgressController::class, 'showStuden
 
 //student
 Route::post('/book-class', [BookingController::class, 'bookClass'])->name('book_class');
-
+Route::group(['middleware' => ['auth:student']], function () {
+    Route::get('/student/profile', [StudentController::class, 'showProfile'])->name('student.profile');
+    Route::post('/student/profile', [StudentController::class, 'updateProfile'])->name('student.profile.update');
+});
 
 
 Route::get('/sregister', [AuthController::class, 'sregister'])->name('sregister'); //untuk get the data from field

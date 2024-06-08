@@ -186,11 +186,11 @@
                     </select>
                 </div>
                 <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                    <label for="date" class="block text-gray-700 font-bold mb-2">Choose a Date:</label>
-                    <input type="text" id="date" name="date" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
+                    <label for="date" class="block text-gray-700 font-bold mb-2">Date:</label>
+                    <input value="Choose a Date"type="text" id="date" name="date" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
                 </div>
                 <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                    <label for="time" class="block text-gray-700 font-bold mb-2">Choose a Time:</label>
+                    <label for="time" class="block text-gray-700 font-bold mb-2">Time:</label>
                     <select name="time" id="time" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
                         <option value="">Select a Time</option>
                         <option value="08:30">08:30 AM - 10:00 AM</option>

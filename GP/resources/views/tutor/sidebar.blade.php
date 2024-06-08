@@ -152,7 +152,7 @@
         <ul>
             <li><a href="{{ route('tutorhomepage') }}">Home</a></li>
             <li><a href="{{ route('tutor_bookings') }}">Booking</a></li>
-            <li><a href="#">Profile</a></li>
+            <li><a href="{{ route('tutor.profile') }}">Profile</a></li>
             <li><a href="{{ route('tutor.students') }}">Students</a></li>
         </ul>
     </div>
