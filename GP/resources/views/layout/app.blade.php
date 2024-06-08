@@ -119,6 +119,17 @@
             width: 100%;
             max-width: 1200px;
         }
+        .bg-yellow-500:hover {
+    background-color: #d97706;
+}
+
+.bg-red-500:hover {
+    background-color: #b91c1c;
+}
+
+.bg-green-500:hover {
+    background-color: #15803d;
+}
         footer {
             background-color: #164863;
             color: white;
@@ -132,6 +143,9 @@ justify-content: center;
             margin-top: auto;
             display: flex;
         }
+        .overflow-x-auto {
+    white-space: nowrap;
+}
         @media (max-width: 768px) {
             .top-bar .menu,
             .top-bar .profile-picture {
@@ -140,6 +154,7 @@ justify-content: center;
             .top-bar .menu-icon {
                 display: block;
             }
+
         }
     </style>
 </head>

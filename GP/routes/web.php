@@ -61,7 +61,8 @@ Route::get('/admin/edittutor/{tutor}', [TutorController::class, 'edit'])->name('
 Route::post('/admin/update/{tutor}', [TutorController::class, 'update'])->name('admin.update');
 Route::get('/admin/viewtutor/{tutor}', [TutorController::class, 'show'])->name('admin.viewtutor');
 Route::delete('/admin/destroy/{tutor}', [TutorController::class, 'destroy'])->name('admin.destroy');
-Route::patch('tutors/{id}/update-status', [TutorController::class, 'updateStatus'])->name('tutors.updateStatus');
+Route::patch('admin/tutors/{id}/status', [TutorController::class, 'updateStatus'])->name('admin.updatestatus');
+
 Route::get('admin/tutors', [TutorController::class, 'index'])->name('tutors.index');
 
 
@@ -83,6 +84,10 @@ Route::post('/update-skill-status/{id}', [LearningProgressController::class, 'up
 Route::get('/learning-progress', [LearningProgressController::class, 'showStudentProgress'])->name('learning_progress');
 
 //student
+Route::post('/book-class', [BookingController::class, 'bookClass'])->name('book_class');
+
+
+
 Route::get('/sregister', [AuthController::class, 'sregister'])->name('sregister'); //untuk get the data from field
 Route::post('/sregister', [AuthController::class, 'sregisterPost'])->name('sregister.save'); //pass ke database
 Route::get('/slogin', [StudentController::class, 'slogin'])->name('slogin'); //login student
@@ -115,7 +120,7 @@ Route::group(['middleware' => ['auth:student']], function () {
     Route::post('/fetch-available-tutors', [BookingController::class, 'fetchAvailableTutors'])->name('fetch_available_tutors');
     Route::post('/create-booking', [BookingController::class, 'bookClass'])->name('create_booking');
     Route::post('/choose-tutor', [BookingController::class, 'chooseTutor'])->name('choose_tutor');
-    Route::post('/edit-booking/{id}', [BookingController::class, 'editBooking'])->name('edit_booking');
+    Route::post('edit-booking/{bookingId}', [BookingController::class, 'editBooking'])->name('editBooking');
     Route::delete('/delete-booking/{id}', [BookingController::class, 'deleteBooking'])->name('delete_booking');
 });
 
