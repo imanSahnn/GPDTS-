@@ -10,6 +10,7 @@ use App\Http\Controllers\TutorController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\LearningProgressController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -38,6 +39,11 @@ Route::get('/payment', [HomeController::class, 'payment'])->name('payment');
 Route::get('/admin/tutors/pending', [HomeController::class, 'pendingTutors'])->name('pendingTutors');
 Route::post('/admin/tutors/approve/{id}', [HomeController::class, 'approveTutor'])->name('admin.tutors.approve');
 Route::post('/admin/tutors/reject/{id}', [HomeController::class, 'rejectTutor'])->name('admin.tutors.reject');
+
+//reprot
+Route::get('/reports', [ReportController::class, 'index'])->name('report.index');
+Route::post('/reports/generate', [ReportController::class, 'generateReport'])->name('admin.reportresult');
+
 
 
 //tutor

@@ -323,7 +323,7 @@
                         <label for="final_statusA" class="block text-gray-700 font-bold mb-2">Status:</label>
                         <input type="text" id="final_statusA" name="final_statusA" value="{{ ucfirst($finalAssessment->final_statusA) }}" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" readonly>
                         <label for="proofA" class="block text-gray-700 font-bold mb-2">Upload File or Image:</label>
-                        <input type="file" id="proofA" name="proofA" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required disabled>
+                        <input type="file" id="proofA" name="proofA" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
                     </div>
 
                     <div class="mb-4">
@@ -331,7 +331,7 @@
                         <label for="final_statusB" class="block text-gray-700 font-bold mb-2">Status:</label>
                         <input type="text" id="final_statusB" name="final_statusB" value="{{ ucfirst($finalAssessment->final_statusB) }}" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" readonly>
                         <label for="proofB" class="block text-gray-700 font-bold mb-2">Upload File or Image:</label>
-                        <input type="file" id="proofB" name="proofB" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required disabled>
+                        <input type="file" id="proofB" name="proofB" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
                     </div>
                     <div class="flex items-center justify-between">
                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit</button>
@@ -376,7 +376,7 @@
                         <option value="completed">Completed</option>
                     </select>
                     <label for="proofA" class="block text-gray-700 font-bold mb-2">Upload File or Image:</label>
-                    <input type="file" id="proofA" name="proofA" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required disabled>
+                    <input type="file" id="proofA" name="proofA" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
                 </div>
 
                 <div class="mb-4">
@@ -387,7 +387,7 @@
                         <option value="completed">Completed</option>
                     </select>
                     <label for="proofB" class="block text-gray-700 font-bold mb-2">Upload File or Image:</label>
-                    <input type="file" id="proofB" name="proofB" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required disabled>
+                    <input type="file" id="proofB" name="proofB" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
                 </div>
 
                 <div class="flex items-center justify-between">
@@ -488,78 +488,76 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
-    $(function() {
-        $("#date, #edit_date").datepicker({
-            dateFormat: 'yy-mm-dd',
-            minDate: 3, // 72 hours minimum
-            beforeShowDay: function(date) {
-                var day = date.getDay();
-                return [(day != 0), '']; // Disable Sundays
-            }
-        });
-
-        $("#final_date").datepicker({
-            dateFormat: 'yy-mm-dd',
-            minDate: 3, // 72 hours minimum
-            beforeShowDay: function(date) {
-                var day = date.getDay();
-                return [day === 0, '']; // Enable only Sundays
-            }
-        });
-
-        $('#book-final-button').on('click', function() {
-            let selectedDate = $('#final_date').datepicker('getDate');
-            if (selectedDate) {
-                $.ajax({
-                    url: '{{ route("schedule_final") }}',
-                    method: 'POST',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        course_id: $('#course_id').val(),
-                        final_date: $('#final_date').val(),
-                        final_statusA: 'pending',
-                        final_statusB: 'pending'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#book-final-button').hide();
-                            $('#final_date').prop('disabled', true);
-                            $('#upload_course_id').val($('#course_id').val());
-                            $('#final-upload-section').show();
-                            alert('Final assessment booked successfully.');
-                        } else {
-                            alert('An error occurred while booking the final assessment: ' + response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        let errorMessage = xhr.status + ': ' + xhr.statusText;
-                        alert('Error - ' + errorMessage);
-                    }
-                });
-            }
-        });
-
-        function checkFinalUploadAvailability() {
-            let currentDate = new Date();
-            @if($finalAssessment)
-                let bookingDate = new Date('{{ $finalAssessment->final_date }}');
-                bookingDate.setHours(8, 30, 0, 0); // Set booking date to 8:30 AM
-
-                if (currentDate >= bookingDate) {
-                    $('#proofA').prop('disabled', false);
-                    $('#proofB').prop('disabled', false);
-                } else {
-                    $('#proofA').prop('disabled', true);
-                    $('#proofB').prop('disabled', true);
-                }
-            @endif
+$(function() {
+    $("#date, #edit_date").datepicker({
+        dateFormat: 'yy-mm-dd',
+        minDate: 3, // 72 hours minimum
+        beforeShowDay: function(date) {
+            var day = date.getDay();
+            return [(day != 0), '']; // Disable Sundays
         }
-
-        setInterval(checkFinalUploadAvailability, 60000); // Check every minute
-
-        // Ensure the upload section is properly enabled/disabled on page load
-        checkFinalUploadAvailability();
     });
+
+    $("#final_date").datepicker({
+        dateFormat: 'yy-mm-dd',
+        minDate: 3, // 72 hours minimum
+        beforeShowDay: function(date) {
+            var day = date.getDay();
+            return [day === 0, '']; // Enable only Sundays
+        }
+    });
+
+    $('#book-final-button').on('click', function() {
+        let selectedDate = $('#final_date').datepicker('getDate');
+        if (selectedDate) {
+            $.ajax({
+                url: '{{ route("schedule_final") }}',
+                method: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    course_id: $('#course_id').val(),
+                    final_date: $('#final_date').val(),
+                    final_statusA: 'pending',
+                    final_statusB: 'pending'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#book-final-button').hide();
+                        $('#final_date').prop('disabled', true);
+                        $('#upload_course_id').val($('#course_id').val());
+                        $('#final-upload-section').show();
+                        alert('Final assessment booked successfully.');
+                    } else {
+                        alert('An error occurred while booking the final assessment: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    let errorMessage = xhr.status + ': ' + xhr.statusText;
+                    alert('Error - ' + errorMessage);
+                }
+            });
+        }
+    });
+
+    function checkFinalUploadAvailability() {
+        let currentDate = new Date();
+        let bookingDate = new Date($('#final_date').datepicker('getDate'));
+        bookingDate.setHours(9, 0, 0, 0); // Set booking date to 9 AM
+
+        if (currentDate >= bookingDate) {
+            $('#proofA').prop('disabled', false);
+            $('#proofB').prop('disabled', false);
+        } else {
+           // $('#proofA').prop('disabled', true);
+          //  $('#proofB').prop('disabled', true);
+        }
+    }
+
+    setInterval(checkFinalUploadAvailability, 60000); // Check every minute
+
+    // Ensure the upload section is properly enabled/disabled on page load
+    checkFinalUploadAvailability();
+});
 
     function editBooking(id, date, time) {
         $('#edit_date').val(date);

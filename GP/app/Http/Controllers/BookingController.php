@@ -11,6 +11,8 @@ use App\Models\Booking;
 use App\Models\StudentCourseSkill;
 use App\Models\Course;
 use App\Models\Rating;
+use Illuminate\Support\Facades\Log;
+
 use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
@@ -295,6 +297,9 @@ class BookingController extends Controller
 
     public function submitFinalAssessment(Request $request)
     {
+        Log::info('submitFinalAssessment called');
+        Log::info('Request data: ', $request->all());
+
         $request->validate([
             'course_id' => 'required|exists:course,id',
             'final_date' => 'required|date',
@@ -308,12 +313,19 @@ class BookingController extends Controller
         $courseId = $request->input('course_id');
         $finalDate = $request->input('final_date');
 
+        Log::info('User ID: ' . $user->id);
+        Log::info('Course ID: ' . $courseId);
+        Log::info('Final Date: ' . $finalDate);
+
         // Store the uploaded files
-        $proofAPath = $request->file('proofA')->store('final_assessments');
-        $proofBPath = $request->file('proofB')->store('final_assessments');
+        $proofAPath = $request->file('proofA')->store('jpj');
+        $proofBPath = $request->file('proofB')->store('jpj');
+
+        Log::info('Proof A Path: ' . $proofAPath);
+        Log::info('Proof B Path: ' . $proofBPath);
 
         // Create the final assessment entry
-        FinalAssessment::create([
+        $finalAssessment = FinalAssessment::create([
             'student_id' => $user->id,
             'course_id' => $courseId,
             'final_date' => $finalDate,
@@ -323,8 +335,12 @@ class BookingController extends Controller
             'proofB' => $proofBPath,
         ]);
 
+        Log::info('Final Assessment created: ', $finalAssessment->toArray());
+
         return redirect()->back()->with('success', 'Final assessment submitted successfully.');
     }
+
+
     public function showFinalAssessmentForm()
     {
         $user = Auth::guard('student')->user();

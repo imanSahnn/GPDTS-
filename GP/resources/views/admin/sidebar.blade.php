@@ -127,6 +127,12 @@
                     Pending
                 </a>
             </li>
+            <li>
+                <a href="{{ route('report.index') }}" class="nav-link {{ request()->is('admin/reports') ? 'active' : '' }}">
+                    <i class="bi bi-book-fill"></i>
+                    Report
+                </a>
+            </li>
         </ul>
 
     </ul>
