@@ -25,44 +25,45 @@
     </script>
 </head>
 <body>
-@extends('tutor.layout')
+    @extends('tutor.layout')
 
-@section('title', 'Homepage')
+    @section('title', 'Homepage')
 
-@section('content')
-<div id="clock" class="text-6xl font-bold text-center"></div>
-<div class="max-w-md w-full mx-auto">
-    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="booking-card">
-            <h2 class="text-xl font-semibold mb-2">Today's Bookings</h2>
-            @if ($todaysBookings->isEmpty())
-                <p>No bookings for today.</p>
-            @else
-                @foreach ($todaysBookings as $booking)
-                    <div class="mb-4">
-                        <p><strong>Student:</strong> <a href="{{ route('studentdetail', ['id' => $booking->student->id]) }}">{{ $booking->student->name }}</a></p>
-                        <p><strong>Date:</strong> {{ $booking->date }}</p>
-                        <p><strong>Time:</strong> {{ $booking->time }}</p>
-                    </div>
-                @endforeach
-            @endif
-        </div>
-        <div class="booking-card">
-            <h2 class="text-xl font-semibold mb-2">Tomorrow's Bookings</h2>
-            @if ($tomorrowsBookings->isEmpty())
-                <p>No bookings for tomorrow.</p>
-            @else
-                @foreach ($tomorrowsBookings as $booking)
-                    <div class="mb-4">
-                        <p><strong>Student:</strong> <a href="{{ route('studentdetail', ['id' => $booking->student->id]) }}">{{ $booking->student->name }}</a></p>
-                        <p><strong>Date:</strong> {{ $booking->date }}</p>
-                        <p><strong>Time:</strong> {{ $booking->time }}</p>
-                    </div>
-                @endforeach
-            @endif
+    @section('content')
+    <div id="clock" class="text-6xl font-bold text-center"></div>
+    <div class="max-w-md w-full mx-auto">
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="booking-card">
+                <h2 class="text-xl font-semibold mb-2">Today's Bookings</h2>
+                @if ($todaysBookings->isEmpty())
+                    <p>No bookings for today.</p>
+                @else
+                    @foreach ($todaysBookings as $booking)
+                        <div class="mb-4">
+                            <p><strong>Student:</strong> <a href="{{ route('tutor.studentdetail', ['id' => $booking->student->id, 'bookingId' => $booking->id]) }}">{{ $booking->student->name }}</a></p>
+                            <p><strong>Date:</strong> {{ $booking->date }}</p>
+                            <p><strong>Time:</strong> {{ $booking->time }}</p>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            <div class="booking-card">
+                <h2 class="text-xl font-semibold mb-2">Tomorrow's Bookings</h2>
+                @if ($tomorrowsBookings->isEmpty())
+                    <p>No bookings for tomorrow.</p>
+                @else
+                    @foreach ($tomorrowsBookings as $booking)
+                        <div class="mb-4">
+                            <p><strong>Student:</strong> <a href="{{ route('tutor.studentdetail', ['id' => $booking->student->id, 'bookingId' => $booking->id]) }}">{{ $booking->student->name }}</a></p>
+                            <p><strong>Date:</strong> {{ $booking->date }}</p>
+                            <p><strong>Time:</strong> {{ $booking->time }}</p>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
         </div>
     </div>
-</div>
-@endsection
+    @endsection
+
 </body>
 </html>

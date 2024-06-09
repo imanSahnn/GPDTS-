@@ -76,34 +76,35 @@
             <img src="{{ asset('storage/' . $student->picture) }}" alt="Profile Picture" class="mx-auto mb-6">
             <p class="text-xl font-medium">
                 Name:
-                <a href="{{ route('tutor.showStudent', $student->id) }}" class="text-blue-500 hover:underline">{{ $student->name }}</a>
+                {{ $student->name }}
             </p>
             <p class="text-xl">Phone Number: {{ $student->number }}</p>
             <p class="text-xl">Email: {{ $student->email }}</p>
         </div>
 
-        <!-- Attendance and Comments Section -->
-        <div class="attendance">
-            <h2 class="text-3xl font-bold mb-6">Attendance and Comments</h2>
-            <form method="POST" action="{{ route('update_booking', $selectedBooking->id) }}" id="updateBookingForm-{{ $selectedBooking->id }}">
-                @csrf
-                <input type="hidden" name="booking_id" id="bookingId" value="{{ $selectedBooking->id }}">
-                <div class="mb-4">
-                    <label for="attendance_status-{{ $selectedBooking->id }}" class="block text-gray-700 text-sm font-bold mb-2">Attendance Status:</label>
-                    <select name="attendance_status" id="attendance_status-{{ $selectedBooking->id }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        <option value="present" {{ $selectedBooking->attendance_status == 'present' ? 'selected' : '' }}>Present</option>
-                        <option value="absent" {{ $selectedBooking->attendance_status == 'absent' ? 'selected' : '' }}>Absent</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="comment-{{ $selectedBooking->id }}" class="block text-gray-700 text-sm font-bold mb-2">Comment:</label>
-                    <textarea name="comment" id="comment-{{ $selectedBooking->id }}" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ $selectedBooking->comment }}</textarea>
-                </div>
-                <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" id="saveButton-{{ $selectedBooking->id }}">Save</button>
-                </div>
-            </form>
-        </div>
+
+    <!-- Attendance and Comments Section -->
+    <div class="attendance">
+        <h2 class="text-3xl font-bold mb-6">Attendance and Comments</h2>
+        <form method="POST" action="{{ route('update_booking', $selectedBooking->id) }}" id="updateBookingForm-{{ $selectedBooking->id }}">
+            @csrf
+            <input type="hidden" name="booking_id" id="bookingId" value="{{ $selectedBooking->id }}">
+            <div class="mb-4">
+                <label for="attendance_status-{{ $selectedBooking->id }}" class="block text-gray-700 text-sm font-bold mb-2">Attendance Status:</label>
+                <select name="attendance_status" id="attendance_status-{{ $selectedBooking->id }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <option value="present" {{ $selectedBooking->attendance_status == 'present' ? 'selected' : '' }}>Present</option>
+                    <option value="absent" {{ $selectedBooking->attendance_status == 'absent' ? 'selected' : '' }}>Absent</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="comment-{{ $selectedBooking->id }}" class="block text-gray-700 text-sm font-bold mb-2">Comment:</label>
+                <textarea name="comment" id="comment-{{ $selectedBooking->id }}" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ $selectedBooking->comment }}</textarea>
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" id="saveButton-{{ $selectedBooking->id }}">Save</button>
+            </div>
+        </form>
+    </div>
 
         <!-- Learning Progress Section -->
         <div class="progress">
@@ -137,20 +138,7 @@
     @endsection
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const now = new Date();
 
-            const bookingDate = new Date('{{ $selectedBooking->date }} {{ $selectedBooking->time }}');
-
-            if (now >= bookingDate) {
-                document.getElementById('attendance_status-{{ $selectedBooking->id }}').removeAttribute('disabled');
-                document.getElementById('comment-{{ $selectedBooking->id }}').removeAttribute('disabled');
-                document.getElementById('saveButton-{{ $selectedBooking->id }}').removeAttribute('disabled');
-            } else {
-                document.getElementById('attendance_status-{{ $selectedBooking->id }}').setAttribute('disabled', 'disabled');
-                document.getElementById('comment-{{ $selectedBooking->id }}').setAttribute('disabled', 'disabled');
-                document.getElementById('saveButton-{{ $selectedBooking->id }}').setAttribute('disabled', 'disabled');
-            }
 
             document.querySelectorAll('form').forEach(form => {
                 form.addEventListener('submit', function (event) {

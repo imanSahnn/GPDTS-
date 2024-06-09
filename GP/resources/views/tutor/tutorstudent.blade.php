@@ -20,18 +20,20 @@
                 </thead>
                 <tbody>
                     @foreach($students as $student)
-                        <tr>
-                            <td class="align-middle ">
-                                <img src="{{ asset('storage/' . $student->picture) }}" alt="Profile Picture" class="rounded-circle" style="width: 60px; height: 60px;">
-                            </td>
-                            <td class="align-middle">{{ $student->name }}</td>
-                            <td class="align-middle d-none d-md-table-cell">{{ $student->ic }}</td>
-                            <td class="align-middle">{{ $student->number }}</td>
-                            <td class="align-middle d-none d-md-table-cell">{{ $student->email }}</td>
-                            <td class="align-middle">
-                                <a href="{{ route('studentdetail', ['id' => $student->id]) }}" class="btn btn-primary">View Booking</a>
-                            </td>
-                        </tr>
+                        @foreach($student->bookings as $booking)
+                            <tr>
+                                <td class="align-middle">
+                                    <img src="{{ asset('storage/' . $student->picture) }}" alt="Profile Picture" class="rounded-circle" style="width: 60px; height: 60px;">
+                                </td>
+                                <td class="align-middle">{{ $student->name }}</td>
+                                <td class="align-middle d-none d-md-table-cell">{{ $student->ic }}</td>
+                                <td class="align-middle">{{ $student->number }}</td>
+                                <td class="align-middle d-none d-md-table-cell">{{ $student->email }}</td>
+                                <td class="align-middle">
+                                    <a href="{{ route('tutor.studentdetail', ['id' => $student->id, 'bookingId' => $booking->id]) }}" class="btn btn-primary">View Booking</a>
+                                </td>
+                            </tr>
+                        @endforeach
                     @endforeach
                 </tbody>
             </table>

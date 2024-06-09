@@ -176,7 +176,7 @@ class TutorController extends Controller
         // Fetch students that have booked with this tutor
         $students = Student::whereHas('bookings', function ($query) use ($user) {
             $query->where('tutor_id', $user->id);
-        })->distinct()->get();
+        })->with('bookings')->distinct()->get();
 
         $profilePicture = $user->picture;
 

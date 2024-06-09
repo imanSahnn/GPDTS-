@@ -142,7 +142,9 @@
                 <tbody>
                     @foreach ($bookings as $booking)
                         <tr>
-                            <td><a href="{{ route('studentdetail', ['id' => $booking->student->id, 'bookingId' => $booking->id]) }}">{{ $booking->student->name }}</a></td>
+                            <td>
+                                <a href="#" onclick="showStudentDetail({{ $booking->student->id }}, '{{ $booking->student->name }}', '{{ $booking->student->number }}', '{{ $booking->student->email }}', '{{ asset('storage/' . $booking->student->picture) }}')">{{ $booking->student->name }}</a>
+                            </td>
                             <td>{{ $booking->date }}</td>
                             <td>{{ $booking->time }}</td>
                             <td>{{ $booking->status }}</td>
@@ -165,6 +167,34 @@
             </table>
         @endif
     </div>
+
+    <!-- Student Detail Modal -->
+    <div id="studentDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 class="text-lg leading-6 font-medium text-gray-900">Student Details</h2>
+            <div id="studentDetails">
+                <!-- Student details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showStudentDetail(id, name, number, email, picture) {
+            var details = `
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Number:</strong> ${number}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <img src="${picture}" alt="${name}" class="w-32 h-32 rounded-full mx-auto mb-4">
+            `;
+            document.getElementById('studentDetails').innerHTML = details;
+            document.getElementById('studentDetailModal').style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById('studentDetailModal').style.display = "none";
+        }
+    </script>
     @endsection
 </body>
 </html>
