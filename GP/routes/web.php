@@ -68,7 +68,7 @@ Route::get('admin/tutors', [TutorController::class, 'index'])->name('tutors.inde
 
     Route::get('/tutor/bookings', [BookingController::class, 'showTutorBookings'])->name('tutor_bookings');
     Route::post('/tutor/bookings/{id}/status', [TutorController::class, 'changeStatus'])->name('tutor.changeStatus');
-    Route::get('/student/{id}/{bookingId}', [BookingController::class, 'showStudent'])->name('studentdetail');
+    Route::get('/student/{id}/{bookingId}', [BookingController::class, 'showStudent'])->name('tutor.studentdetail');
     Route::post('/tutor/update-booking/{id}', [BookingController::class, 'updateBooking'])->name('update_booking');
     Route::post('/tutor/change-booking-status/{id}', [BookingController::class, 'changeBookingStatus'])->name('change_booking_status');
 
@@ -85,6 +85,12 @@ Route::group(['middleware' => ['auth:tutor']], function () {
 Route::post('/tutor/skills/update', [LearningProgressController::class, 'updateAllSkills'])->name('update_all_skills');
 Route::post('/update-skill-status/{id}', [LearningProgressController::class, 'updateSkillStatus'])->name('update_skill_status');
 Route::get('/learning-progress', [LearningProgressController::class, 'showStudentProgress'])->name('learning_progress');
+Route::post('/submit-final', [BookingController::class, 'submitFinal'])->name('submit_final');
+Route::get('/view-final/{id}', [BookingController::class, 'viewFinal'])->name('view_final');
+Route::post('/schedule-final', [BookingController::class, 'scheduleFinal'])->name('schedule_final');
+Route::post('/submit-final-assessment', [BookingController::class, 'submitFinalAssessment'])->name('submit_final_assessment');
+
+Route::get('/final-assessment', [BookingController::class, 'showFinalAssessmentForm'])->name('final_assessment_form');
 
 //student
 Route::post('/book-class', [BookingController::class, 'bookClass'])->name('book_class');
@@ -122,12 +128,14 @@ Route::middleware(['auth:student'])->group(function () {
 });
 
 Route::group(['middleware' => ['auth:student']], function () {
+    Route::get('/book-tutor', [BookingController::class, 'showBookingPage'])->name('bookings');
     Route::get('/book-tutor', [BookingController::class, 'showBookingForm'])->name('bookings');
     Route::post('/fetch-available-tutors', [BookingController::class, 'fetchAvailableTutors'])->name('fetch_available_tutors');
     Route::post('/create-booking', [BookingController::class, 'bookClass'])->name('create_booking');
     Route::post('/choose-tutor', [BookingController::class, 'chooseTutor'])->name('choose_tutor');
     Route::post('edit-booking/{bookingId}', [BookingController::class, 'editBooking'])->name('editBooking');
     Route::delete('/delete-booking/{id}', [BookingController::class, 'deleteBooking'])->name('delete_booking');
+    Route::post('/final_assessment/store', [LearningProgressController::class, 'store'])->name('final_assessment.store');
 });
 
 Route::get('/student/tutor-list', [StudentController::class, 'showTutorList'])->name('student.tutor_list');

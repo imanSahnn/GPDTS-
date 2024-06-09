@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Skill;
 use App\Models\Student;
 use App\Models\Booking;
+use App\Models\Final;
 use App\Models\StudentCourseSkill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -90,5 +91,7 @@ class LearningProgressController extends Controller
 
         return view('student.learning_progress', compact('courses', 'skillsProgress', 'allBookings'));
     }
+
+
 }
 

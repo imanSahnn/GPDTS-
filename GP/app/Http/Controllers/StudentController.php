@@ -238,6 +238,19 @@ class StudentController extends Controller
         return redirect()->route('student.profile')->with('success', 'Profile updated successfully.');
     }
 
+    public function showFinalAssessments()
+    {
+        $courses = Course::with(['students' => function ($query) {
+            $query->whereHas('bookings', function ($bookingQuery) {
+                $bookingQuery->where('attendance_status', 'present')
+                    ->groupBy('student_id')
+                    ->havingRaw('SUM(1.5) > 10'); // Check for over 10 hours of present status bookings
+            });
+        }])->get();
+
+        return view('final_assessments.index', compact('courses'));
+    }
+
 
 }
 

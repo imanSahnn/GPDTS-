@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Tutor;
+use App\Models\FinalAssessment;
 use App\Models\Student;
 use App\Models\Booking;
 use App\Models\StudentCourseSkill;
@@ -21,34 +22,41 @@ class BookingController extends Controller
         $selectedTutorId = $user->selected_tutor_id;
         $hasTutor = !is_null($selectedTutorId);
 
-        // Ensure $chosenCourses is correctly set and remove duplicates
         $chosenCourses = $user->courses->unique('id');
 
-        // Calculate if each course meets the 15% payment requirement
         $coursePaymentStatus = [];
         foreach ($chosenCourses as $course) {
             $totalPaid = $user->payments()->where('course_id', $course->id)->where('status', 'approved')->sum('total_payment');
-            $coursePaymentStatus[$course->id] = $totalPaid >= 0.15 * $course->price;
+            $coursePaymentStatus[$course->id] = $totalPaid >= $course->price;
         }
+
+        $canTakeFinal = false;
+        $selectedCourseId = null;
+        $eligibleCourses = $user->courses->filter(function ($course) use ($user) {
+            return $user->isEligibleForFinal($course->id);
+        });
 
         if ($hasTutor) {
             $tutors = Tutor::where('id', $selectedTutorId)->get();
         } else {
             $tutors = Tutor::where('status', 'active')
-                           ->whereHas('course', function($query) use ($user) {
-                               $query->whereIn('id', $user->courses->pluck('id')->unique());
-                           })
-                           ->get();
+                ->whereHas('course', function ($query) use ($user) {
+                    $query->whereIn('id', $user->courses->pluck('id')->unique());
+                })
+                ->get();
         }
 
         $bookings = Booking::where('student_id', $user->id)
-                           ->orderByRaw("FIELD(status, 'approved', 'pending', 'rejected')")
-                           ->with('tutor', 'course')
-                           ->get();
+            ->orderByRaw("FIELD(status, 'approved', 'pending', 'rejected')")
+            ->with('tutor', 'course')
+            ->get();
 
-        // Pass $coursePaymentStatus to the view
-        return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses', 'coursePaymentStatus'));
+        // Fetch the final assessment booking if it exists
+        $finalAssessment = FinalAssessment::where('student_id', $user->id)->first();
+
+        return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses', 'coursePaymentStatus', 'canTakeFinal', 'selectedCourseId', 'eligibleCourses', 'finalAssessment'));
     }
+
 
     public function chooseTutor(Request $request)
     {
@@ -232,7 +240,7 @@ class BookingController extends Controller
 
         $booking->save();
 
-        return redirect()->route('studentdetail', ['id' => $booking->student_id])->with('success', 'Booking updated successfully.');
+        return redirect()->route('tutor.studentdetail', ['id' => $booking->student_id, 'bookingId' => $booking->id])->with('success', 'Booking updated successfully.');
     }
 
     public function submitReview(Request $request, $id)
@@ -255,4 +263,75 @@ class BookingController extends Controller
 
         return redirect()->back()->with('success', 'Review submitted successfully.');
     }
+
+    public function scheduleFinal(Request $request)
+    {
+        $request->validate([
+            'course_id' => 'required|exists:course,id',
+            'final_date' => 'required|date|after_or_equal:' . Carbon::now()->addDays(3)->format('Y-m-d'), // Ensure date is at least 72 hours in the future
+            'final_statusA' => 'required|in:pending,completed',
+            'final_statusB' => 'required|in:pending,completed',
+        ]);
+
+        $user = Auth::guard('student')->user();
+        $courseId = $request->input('course_id');
+
+        if (!$user->isEligibleForFinal($courseId)) {
+            return response()->json(['success' => false, 'message' => 'You are not eligible to schedule the final assessment.']);
+        }
+
+        $finalAssessment = new FinalAssessment();
+        $finalAssessment->student_id = $user->id;
+        $finalAssessment->course_id = $courseId;
+        $finalAssessment->final_date = $request->input('final_date');
+        $finalAssessment->final_statusA = $request->input('final_statusA');
+        $finalAssessment->final_statusB = $request->input('final_statusB');
+        $finalAssessment->save();
+
+        return response()->json(['success' => true, 'message' => 'Final assessment booked successfully.']);
+    }
+
+
+
+    public function submitFinalAssessment(Request $request)
+    {
+        $request->validate([
+            'course_id' => 'required|exists:course,id',
+            'final_date' => 'required|date',
+            'final_statusA' => 'required|string',
+            'proofA' => 'required|file|mimes:pdf,jpg,jpeg,png',
+            'final_statusB' => 'required|string',
+            'proofB' => 'required|file|mimes:pdf,jpg,jpeg,png',
+        ]);
+
+        $user = Auth::guard('student')->user();
+        $courseId = $request->input('course_id');
+        $finalDate = $request->input('final_date');
+
+        // Store the uploaded files
+        $proofAPath = $request->file('proofA')->store('final_assessments');
+        $proofBPath = $request->file('proofB')->store('final_assessments');
+
+        // Create the final assessment entry
+        FinalAssessment::create([
+            'student_id' => $user->id,
+            'course_id' => $courseId,
+            'final_date' => $finalDate,
+            'final_statusA' => $request->input('final_statusA'),
+            'proofA' => $proofAPath,
+            'final_statusB' => $request->input('final_statusB'),
+            'proofB' => $proofBPath,
+        ]);
+
+        return redirect()->back()->with('success', 'Final assessment submitted successfully.');
+    }
+    public function showFinalAssessmentForm()
+    {
+        $user = Auth::guard('student')->user();
+        $eligibleCourses = Course::whereNotIn('id', Auth::user()->bookings()->whereNotNull('final_date')->pluck('course_id'))->get();
+
+        return view('student.final-assessment', compact('eligibleCourses'));
+    }
+
+
 }

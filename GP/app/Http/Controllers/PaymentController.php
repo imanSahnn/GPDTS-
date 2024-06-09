@@ -10,7 +10,7 @@ use App\Models\StudentCourseSkill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class LearningProgressController extends Controller
+class PaymentController extends Controller
 {
     public function enroll(Request $request)
     {
