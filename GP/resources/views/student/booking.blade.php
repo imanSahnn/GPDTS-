@@ -322,19 +322,12 @@
                         <h3 class="text-lg font-bold mb-2">Section A</h3>
                         <label for="final_statusA" class="block text-gray-700 font-bold mb-2">Status:</label>
                         <input type="text" id="final_statusA" name="final_statusA" value="{{ ucfirst($finalAssessment->final_statusA) }}" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" readonly>
-                        <label for="proofA" class="block text-gray-700 font-bold mb-2">Upload File or Image:</label>
-                        <input type="file" id="proofA" name="proofA" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
                     </div>
 
                     <div class="mb-4">
                         <h3 class="text-lg font-bold mb-2">Section B</h3>
                         <label for="final_statusB" class="block text-gray-700 font-bold mb-2">Status:</label>
                         <input type="text" id="final_statusB" name="final_statusB" value="{{ ucfirst($finalAssessment->final_statusB) }}" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" readonly>
-                        <label for="proofB" class="block text-gray-700 font-bold mb-2">Upload File or Image:</label>
-                        <input type="file" id="proofB" name="proofB" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit</button>
                     </div>
                 </form>
             </div>
@@ -371,30 +364,16 @@
                 <div class="mb-4">
                     <h3 class="text-lg font-bold mb-2">Section A</h3>
                     <label for="final_statusA" class="block text-gray-700 font-bold mb-2">Status:</label>
-                    <select id="final_statusA" name="final_statusA" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
-                        <option value="pending">Pending</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                    <label for="proofA" class="block text-gray-700 font-bold mb-2">Upload File or Image:</label>
-                    <input type="file" id="proofA" name="proofA" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
+                    <input type="text" id="final_statusA" name="final_statusA" value="Pending" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" readonly>
                 </div>
 
                 <div class="mb-4">
                     <h3 class="text-lg font-bold mb-2">Section B</h3>
                     <label for="final_statusB" class="block text-gray-700 font-bold mb-2">Status:</label>
-                    <select id="final_statusB" name="final_statusB" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
-                        <option value="pending">Pending</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                    <label for="proofB" class="block text-gray-700 font-bold mb-2">Upload File or Image:</label>
-                    <input type="file" id="proofB" name="proofB" accept=".pdf, image/*" class="block w-full text-gray-700 bg-gray-200 border border-gray-200 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" required>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit</button>
+                    <input type="text" id="final_statusB" name="final_statusB" value="Pending" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" readonly>
                 </div>
             </form>
-        </div>
+        </div
     </div>
 @endif
 

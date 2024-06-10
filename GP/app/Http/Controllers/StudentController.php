@@ -24,9 +24,44 @@ class StudentController extends Controller
         // Retrieve the user's profile picture filename
         $profilePicture = Student::where('id', $user->id)->value('picture');
 
-        // Pass the authenticated user's profile picture filename to the view
-        return view('student.shomepage', compact('profilePicture'));
-        return view('student.shomepage', compact('profilePicture'));
+        // Fetch approved bookings
+        $approvedBookings = Booking::where('student_id', $user->id)
+            ->where('status', 'approved')
+            ->with('tutor', 'course')
+            ->get();
+
+        // Fetch courses for the user
+        $courses = $user->courses()->distinct()->get();
+
+        // Fetch learning progress data for the first course as default
+        $selectedCourseId = $courses->first()->id ?? null;
+        $progressData = $this->getProgressData($user->id, $selectedCourseId);
+
+        return view('student.shomepage', compact('profilePicture', 'approvedBookings', 'courses', 'selectedCourseId', 'progressData'));
+    }
+
+    private function getProgressData($studentId, $courseId)
+    {
+        $skillsProgress = StudentCourseSkill::where('student_id', $studentId)
+            ->where('course_id', $courseId)
+            ->select('status_skill', \DB::raw('count(*) as total'))
+            ->groupBy('status_skill')
+            ->get();
+
+        return $skillsProgress->mapWithKeys(function ($item) {
+            return [$item['status_skill'] => $item['total']];
+        });
+    }
+
+    public function updateProgress(Request $request)
+    {
+        $student = Auth::guard('student')->user();
+        $courseId = $request->input('course_id');
+
+        // Fetch learning progress data for the selected course
+        $progressData = $this->getProgressData($student->id, $courseId);
+
+        return response()->json(['progressData' => $progressData]);
     }
 
     public function edit($id)

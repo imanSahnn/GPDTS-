@@ -1,11 +1,14 @@
 <?php
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Course;
 use App\Models\Payment;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\InvoiceMail;
 
 class PaymentController extends Controller
 {
@@ -62,7 +65,17 @@ class PaymentController extends Controller
         $payment->status = 'approved';
         $payment->save();
 
-        return redirect()->back()->with('success', 'Payment approved successfully.');
+        // Generate PDF
+        $pdf = Pdf::loadView('admin.invoice', compact('payment'));
+
+        // Save PDF to storage
+        $filePath = 'invoices/' . $payment->id . '_invoice.pdf';
+        Storage::disk('public')->put($filePath, $pdf->output());
+
+        // Update payment with the invoice path
+        $payment->update(['invoice' => $filePath]);
+
+        return redirect()->back()->with('success', 'Payment approved successfully and invoice saved.');
     }
 
     public function rejectPayment($id)

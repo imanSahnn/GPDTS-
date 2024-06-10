@@ -19,6 +19,7 @@ class Payment extends Model
         'total_course_price',
         'payment_proof',
         'status',
+        'invoice',
     ];
 
     public function student()

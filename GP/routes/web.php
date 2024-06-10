@@ -112,6 +112,7 @@ Route::get('/slogin', [StudentController::class, 'slogin'])->name('slogin'); //l
 Route::post('/slogin', [StudentController::class, 'sloginPost'])->name('slogin.save'); // check ke db and validation
 
 Route::get('/shomepage', [StudentController::class, 'index'])->name('shomepage'); //bawak ke student homepage
+Route::get('/update-progress', [StudentController::class, 'updateProgress']);
 
 Route::get('/admin/createstudent', [StudentController::class, 'create'])->name('admin.createstudent');
 Route::post('/admin/storestudent', [AuthController::class, 'sstore'])->name('admin.storestudent');

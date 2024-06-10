@@ -77,6 +77,39 @@
         </div>
     </div>
 
+    <!-- Past Payments and Invoice Section -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
+        <h2 class="text-2xl font-bold mb-4">Your Payments</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b border-gray-200">Course</th>
+                        <th class="py-2 px-4 border-b border-gray-200">Total Payment</th>
+                        <th class="py-2 px-4 border-b border-gray-200">Status</th>
+                        <th class="py-2 px-4 border-b border-gray-200">Invoice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($student->payments as $payment)
+                        <tr class="text-center">
+                            <td class="py-2 px-4 border-b border-gray-200">{{ $payment->course->name }}</td>
+                            <td class="py-2 px-4 border-b border-gray-200">${{ $payment->total_payment }}</td>
+                            <td class="py-2 px-4 border-b border-gray-200">{{ ucfirst($payment->status) }}</td>
+                            <td class="py-2 px-4 border-b border-gray-200">
+                                @if($payment->status == 'approved' && $payment->invoice)
+                                    <a href="{{ asset('storage/' . $payment->invoice) }}" class="text-blue-500 hover:underline" download>Download Invoice</a>
+                                @else
+                                    N/A
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <script>
         document.getElementById('course_id').addEventListener('change', function () {
             const selectedOption = this.options[this.selectedIndex];
