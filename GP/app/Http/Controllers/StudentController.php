@@ -135,15 +135,15 @@ class StudentController extends Controller
     }
     public function showTutorList()
     {
-        $student = Auth::guard('student')->user();
-        $courseIds = $student->courses()->pluck('course.id');
+        $user = Auth::guard('student')->user();
+        $courseIds = $user->courses()->pluck('course.id');
         $tutors = Tutor::whereIn('course_id', $courseIds)->with('course')->orderBy('created_at', 'desc')->get();
-
+        $profilePicture = Student::where('id', $user->id)->value('picture');
         foreach ($tutors as $tutor) {
             $tutor->average_rating = $tutor->ratings()->avg('rate'); // Calculate average rate
         }
 
-        return view('student.tutorlist', compact('tutors'));
+        return view('student.tutorlist', compact('tutors','profilePicture'));
     }
 
 
@@ -201,7 +201,8 @@ class StudentController extends Controller
     public function showProfile()
     {
         $student = Auth::guard('student')->user();
-        return view('student.studentprofile', compact('student'));
+        $profilePicture = Student::where('id', $student->id)->value('picture');
+        return view('student.studentprofile', compact('student','profilePicture'));
     }
 
     public function updateProfile(Request $request)

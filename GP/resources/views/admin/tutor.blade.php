@@ -3,46 +3,46 @@
 @section('title', 'Tutors')
 
 @section('content')
-<div class="container mx-auto mt-8">
+<div class="container mt-8">
     <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold">Approved Tutors</h1>
-        <a href="{{ route('admin.createtutor') }}" class="bg-blue-500 text-white px-4 py-2 rounded">Add New Tutor</a>
+        <h1 class="text-2xl font-bold text-[#004225]">Approved Tutors</h1>
+        <a href="{{ route('admin.createtutor') }}" class="btn btn-primary">Add New Tutor</a>
     </div>
 
     @if(session('success'))
-        <div class="bg-green-500 text-white p-4 rounded mb-4">
+        <div class="alert alert-success">
             {{ session('success') }}
         </div>
     @endif
 
     <div class="table-responsive">
-        <table class="min-w-full bg-white">
-            <thead>
+        <table class="table table-hover">
+            <thead class="bg-[#FFCF9D]">
                 <tr>
-                    <th class="py-2 px-4 border-b border-gray-200">Name</th>
-                    <th class="py-2 px-4 border-b border-gray-200">Email</th>
-                    <th class="py-2 px-4 border-b border-gray-200">IC</th>
-                    <th class="py-2 px-4 border-b border-gray-200">Phone Number</th>
-                    <th class="py-2 px-4 border-b border-gray-200">Course</th>
-                    <th class="py-2 px-4 border-b border-gray-200">Actions</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>IC</th>
+                    <th>Phone Number</th>
+                    <th>Course</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($tutors as $tutor)
-                    <tr>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $tutor->name }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $tutor->email }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $tutor->ic }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $tutor->number }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $tutor->course->name }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">
-                            <a href="{{ route('admin.edittutor', [$tutor->id]) }}" class="btn btn-sm btn-info">Edit</a>
-                            <form action="{{ route('admin.destroy', $tutor->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this tutor?');">
+                    <tr class="hover:bg-gray-50 transition duration-150">
+                        <td>{{ $tutor->name }}</td>
+                        <td>{{ $tutor->email }}</td>
+                        <td>{{ $tutor->ic }}</td>
+                        <td>{{ $tutor->number }}</td>
+                        <td>{{ $tutor->course->name }}</td>
+                        <td class="actions">
+                            <a href="{{ route('admin.edittutor', [$tutor->id]) }}" class="btn btn-sm btn-secondary">Edit</a>
+                            <form action="{{ route('admin.destroy', $tutor->id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this tutor?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                             </form>
-                            <form action="{{ route('admin.updatestatus', $tutor->id) }}" method="POST" style="display: inline-block;">
+                            <form action="{{ route('admin.updatestatus', $tutor->id) }}" method="POST" class="inline-form">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" class="btn btn-sm {{ $tutor->status === 'active' ? 'btn-warning' : 'btn-success' }}">

@@ -71,6 +71,7 @@ class LearningProgressController extends Controller
     public function showStudentProgress()
     {
         $student = Auth::guard('student')->user();
+        $profilePicture = Student::where('id', $student->id)->value('picture');
         $courses = $student->courses()->distinct()->with('skills')->get();
         $skillsProgress = StudentCourseSkill::where('student_id', $student->id)->get()->keyBy(function ($item) {
             return $item['course_id'] . '-' . $item['skill_id'];
@@ -89,7 +90,7 @@ class LearningProgressController extends Controller
             $booking->course_name = $booking->course ? $booking->course->name : 'N/A';
         });
 
-        return view('student.learning_progress', compact('courses', 'skillsProgress', 'allBookings'));
+        return view('student.learning_progress', compact('courses', 'skillsProgress', 'allBookings','profilePicture'));
     }
 
 

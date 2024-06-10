@@ -16,8 +16,8 @@
     <section class="bg-blue-100 min-h-screen flex items-center justify-center">
         <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-lg xl:p-0 mx-4 md:mx-auto">
             <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                <div class="flex justify-center items-center">
-                    <img src="{{ Storage::url('public/adminpage/gplogo.png') }}" alt="Gentian Padu Driving School Logo" class="h-12 w-12 mr-2">
+                <div class="flex items-center justify-center p-5">
+
                     <h1 class="text-2xl font-bold leading-tight tracking-tight text-gray-900 md:text-3xl text-center">
                         Gentian Padu Driving School
                     </h1>
@@ -111,8 +111,70 @@
                             <div class="mt-2">
                                 <p class="text-sm text-gray-500">
                                     <!-- Insert your terms and conditions content here -->
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa.
-                                </p>
+                                    Terms and Conditions
+                                    <p class="text-sm text-gray-500">
+                                    Welcome to Gentian Padu Driving School ("the School", "we", "us", or "our"). By accessing and using our website ("Site"), you agree to comply with and be bound by the following terms and conditions ("Terms"). Please read these Terms carefully before using our Site.
+                                    <p class="text-sm text-gray-500">
+                                    1. Acceptance of Terms
+
+                                    By using our Site, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use our Site.
+                                    <p class="text-sm text-gray-500">
+                                    2. Changes to Terms
+
+                                    We reserve the right to modify these Terms at any time. Any changes will be posted on this page, and your continued use of the Site after such changes are posted constitutes your acceptance of the new Terms.
+                                    <p class="text-sm text-gray-500">
+                                    3. Eligibility
+
+                                    To use our Site, you must be at least 18 years old or have the consent of a parent or guardian. By using our Site, you represent and warrant that you meet this requirement.
+                                    <p class="text-sm text-gray-500">
+                                    4. Services
+
+                                    We provide driving lessons, courses, and related services ("Services"). The details of the Services, including prices and schedules, are available on our Site. We reserve the right to modify or discontinue any Service at any time without notice.
+                                    <p class="text-sm text-gray-500">
+                                    5. Booking and Payments
+
+                                    All bookings for lessons and courses must be made through our Site.
+                                    Payment for Services must be made in advance at the time of booking.
+                                    We accept payments via [payment methods].
+                                    Cancellation and refund policies are detailed in our Cancellation Policy, available on our Site.
+                                    <p class="text-sm text-gray-500">
+                                    6. User Conduct
+
+                                    You agree to use the Site only for lawful purposes and in a manner that does not infringe the rights of, restrict, or inhibit anyone else's use and enjoyment of the Site. Prohibited behavior includes, but is not limited to, harassment, causing distress or inconvenience to any other user, transmitting obscene or offensive content, or disrupting the normal flow of dialogue within our Site.
+                                    <p class="text-sm text-gray-500">
+                                    7. Privacy
+
+                                    Your privacy is important to us. Please review our Privacy Policy, which explains how we collect, use, and protect your personal information.
+                                    <p class="text-sm text-gray-500">
+                                    8. Intellectual Property
+
+                                    All content on our Site, including text, graphics, logos, images, and software, is the property of Gentian Padu Driving School or its content suppliers and is protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works from any content on our Site without our prior written permission.
+                                    <p class="text-sm text-gray-500">
+                                    9. Disclaimers and Limitation of Liability
+
+                                    We provide the Site and Services on an "as is" and "as available" basis. We make no representations or warranties of any kind, express or implied, regarding the operation of the Site or the information, content, materials, or products included on the Site.
+                                    To the fullest extent permitted by law, we disclaim all warranties, express or implied, including but not limited to implied warranties of merchantability and fitness for a particular purpose.
+                                    We will not be liable for any damages of any kind arising from the use of the Site or Services, including but not limited to direct, indirect, incidental, punitive, and consequential damages.
+                                    <p class="text-sm text-gray-500">
+                                    10. Indemnification
+
+                                    You agree to indemnify, defend, and hold harmless Gentian Padu Driving School, its officers, directors, employees, agents, licensors, and suppliers from and against all claims, liabilities, losses, expenses, damages, and costs, including reasonable attorneys' fees, arising out of or in connection with your use of the Site or Services or any violation of these Terms.
+                                    <p class="text-sm text-gray-500">
+                                    11. Governing Law
+
+                                    These Terms are governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law principles. You agree to submit to the exclusive jurisdiction of the courts located in [Your Jurisdiction] for the resolution of any disputes arising out of or relating to these Terms or your use of the Site or Services.
+                                    <p class="text-sm text-gray-500">
+                                    12. Contact Information
+
+                                    If you have any questions or concerns about these Terms or our Site, please contact us at:
+                                    <p class="text-sm text-gray-500">
+                                    Gentian Padu Driving School
+                                    [Address]
+                                    [Email]
+                                    [Phone Number]
+                                    <p class="text-sm text-gray-500">
+                                    Thank you for choosing Gentian Padu Driving School.
+                                </p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p></p>
                             </div>
                         </div>
                     </div>

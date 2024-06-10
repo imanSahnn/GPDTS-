@@ -1,31 +1,65 @@
-<!-- resources/views/layouts/app.blade.php -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Homepage')</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel Project</title>
+    <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
             display: flex;
-            background-color: #151709;
-            background-image: url('{{ asset('storage/adminpage/background1.jpg') }}'); /* Correct path to your background image */
-            background-size: cover; /* Cover the entire content area */
-            background-position: center; /* Center the image */
-            background-repeat: no-repeat; /* Do not repeat the image */
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #dc7f57; /* Background color for the body */
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #FFCF9D; /* Sidebar background color */
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
         }
         .content {
-            flex-grow: 1;
-            margin-left: 280px; /* Adjust for sidebar width */
+            margin-left: 250px;
             padding: 20px;
-            background-color: rgba(67, 120, 225, 0.8); /* Semi-transparent blue to overlay */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: 20px;
-            border-radius: 8px;
-            color: #000; /* Ensure text is readable */
+            flex-grow: 1;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            background-color: #FFB000; /* Hover color for links */
+        }
+        .nav-link.active {
+            background-color: #004225; /* Active link color */
+            color: #fff;
+        }
+        .nav-link i {
+            margin-right: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .btn-primary {
+            background-color: #FFB000; /* Primary button color */
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #FFCF9D; /* Primary button hover color */
+        }
+        .alert-success {
+            background-color: #FFCF9D; /* Alert success background color */
+            color: white;
         }
     </style>
 </head>
@@ -34,8 +68,5 @@
     <div class="content">
         @yield('content')
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

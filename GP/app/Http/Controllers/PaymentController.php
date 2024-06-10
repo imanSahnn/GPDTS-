@@ -12,8 +12,11 @@ class PaymentController extends Controller
     public function showPaymentForm()
     {
         $student = Auth::guard('student')->user();
+        $profilePicture = Student::where('id', $student->id)->value('picture');
         $courses = $student->courses()->distinct()->with('payments')->get();
-        return view('student.payment', compact('courses', 'student'));
+        return view('student.payment', compact('courses', 'student','profilePicture'));
+
+
     }
 
     public function submitPayment(Request $request)

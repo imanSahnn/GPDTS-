@@ -10,14 +10,22 @@
     <title>Login</title>
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js"></script>
+    <style>
+        body {
+            background-image: url('{{ asset('storage/jpj/bgregister.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
 </head>
 
 <body class="bg-blue-100 min-h-screen flex items-center justify-center">
     <section class="w-full flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
             <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                <div class="flex justify-center">
-                    <img src="{{ Storage::url('public/adminpage/gplogo.png') }}" alt="Gentian Padu Driving School Logo" class="h-45 w-45">
+                <div class="logo">
+                    <img src="{{ asset('storage/jpj/gplogo (1).png') }}" alt="Gentian Padu Driving School Logo" class="h-45 w-45">
                 </div>
                 <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl text-center">
                     Gentian Padu Student

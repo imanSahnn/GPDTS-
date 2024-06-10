@@ -191,7 +191,7 @@ justify-content: center;
         <ul>
             <li><a href="{{ route('shomepage') }}">Home</a></li>
             <li><a href="{{ route('bookings') }}">Booking</a></li>
-            <li><a href="#">Profile</a></li>
+            <li><a href="{{ route('student.profile') }}">Profile</a></li>
             <li><a href="{{ route('learning_progress') }}">Learning Progress</a></li>
             <li><a href="{{ route('course_list') }}">Course</a></li>
             <li><a href="{{ route('tutor_list') }}">Tutor List</a></li>
