@@ -25,9 +25,9 @@ class PaymentController extends Controller
     public function submitPayment(Request $request)
     {
         $request->validate([
-            'course_id' => 'required|exists:course,id', // Correct the table name to match your database schema
+            'course_id' => 'required|exists:course,id',
             'total_payment' => 'required|numeric',
-            'payment_proof' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048', // Include PDF in the validation
+            'payment_proof' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
         ]);
 
         $student = Auth::guard('student')->user();
@@ -37,19 +37,21 @@ class PaymentController extends Controller
             $proofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
         }
 
-        // Create a new payment record
         Payment::create([
             'student_id' => $student->id,
             'course_id' => $request->course_id,
             'name' => $student->name,
             'ic' => $student->ic,
             'total_payment' => $request->total_payment,
+            'current_total' => null,  // Do not set current_total here
+            'total_course_price' => $course->price,
             'payment_proof' => $proofPath,
             'status' => 'pending',
         ]);
 
         return redirect()->back()->with('success', 'Payment submitted successfully. Awaiting approval.');
     }
+
 
     public function showConfirmPayment()
     {
@@ -62,8 +64,20 @@ class PaymentController extends Controller
     public function approvePayment($id)
     {
         $payment = Payment::findOrFail($id);
-        $payment->status = 'approved';
-        $payment->save();
+        $student = $payment->student;
+        $course = $payment->course;
+
+        // Calculate the current total after approval
+        $currentTotal = $student->payments()
+            ->where('course_id', $course->id)
+            ->where('status', 'approved')
+            ->sum('total_payment') + $payment->total_payment;
+
+        // Update payment status to approved and set current_total
+        $payment->update([
+            'status' => 'approved',
+            'current_total' => $currentTotal
+        ]);
 
         // Generate PDF
         $pdf = Pdf::loadView('admin.invoice', compact('payment'));

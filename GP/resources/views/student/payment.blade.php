@@ -49,6 +49,7 @@
             <form action="{{ route('submit_payment') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="course_id" id="selectedCourseId">
+                <input type="hidden" name="current_total" id="current_total"> <!-- Hidden input for current total -->
                 <input type="hidden" id="coursePrice"> <!-- Hidden input for course price -->
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
@@ -76,6 +77,7 @@
             </form>
         </div>
     </div>
+</div>
 
     <!-- Past Payments and Invoice Section -->
     <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
