@@ -18,46 +18,46 @@ use Illuminate\Support\Facades\Auth;
 class BookingController extends Controller
 {
     public function showBookingForm()
-    {
-        $user = Auth::guard('student')->user();
-        $profilePicture = $user->picture;
-        $selectedTutorId = $user->selected_tutor_id;
-        $hasTutor = !is_null($selectedTutorId);
+{
+    $user = Auth::guard('student')->user();
+    $profilePicture = $user->picture;
+    $selectedTutorId = $user->selected_tutor_id;
+    $hasTutor = !is_null($selectedTutorId);
 
-        $chosenCourses = $user->courses->unique('id');
+    $chosenCourses = $user->courses->unique('id');
 
-        $coursePaymentStatus = [];
-        foreach ($chosenCourses as $course) {
-            $totalPaid = $user->payments()->where('course_id', $course->id)->where('status', 'approved')->sum('total_payment');
-            $coursePaymentStatus[$course->id] = $totalPaid >= $course->price;
-        }
-
-        $canTakeFinal = false;
-        $selectedCourseId = null;
-        $eligibleCourses = $user->courses->filter(function ($course) use ($user) {
-            return $user->isEligibleForFinal($course->id);
-        });
-
-        if ($hasTutor) {
-            $tutors = Tutor::where('id', $selectedTutorId)->get();
-        } else {
-            $tutors = Tutor::where('status', 'active')
-                ->whereHas('course', function ($query) use ($user) {
-                    $query->whereIn('id', $user->courses->pluck('id')->unique());
-                })
-                ->get();
-        }
-
-        $bookings = Booking::where('student_id', $user->id)
-            ->orderByRaw("FIELD(status, 'approved', 'pending', 'rejected')")
-            ->with('tutor', 'course')
-            ->get();
-
-        // Fetch the final assessment booking if it exists
-        $finalAssessment = FinalAssessment::where('student_id', $user->id)->first();
-
-        return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses', 'coursePaymentStatus', 'canTakeFinal', 'selectedCourseId', 'eligibleCourses', 'finalAssessment'));
+    $coursePaymentStatus = [];
+    foreach ($chosenCourses as $course) {
+        $totalPaid = $user->payments()->where('course_id', $course->id)->where('status', 'approved')->sum('total_payment');
+        $coursePaymentStatus[$course->id] = $totalPaid >= (0.15 * $course->price);
     }
+
+    $canTakeFinal = false;
+    $selectedCourseId = null;
+    $eligibleCourses = $user->courses->filter(function ($course) use ($user) {
+        return $user->isEligibleForFinal($course->id);
+    });
+
+    if ($hasTutor) {
+        $tutors = Tutor::where('id', $selectedTutorId)->get();
+    } else {
+        $tutors = Tutor::where('status', 'active')
+            ->whereHas('course', function ($query) use ($user) {
+                $query->whereIn('id', $user->courses->pluck('id')->unique());
+            })
+            ->get();
+    }
+
+    $bookings = Booking::where('student_id', $user->id)
+        ->orderByRaw("FIELD(status, 'approved', 'pending', 'rejected')")
+        ->with('tutor', 'course')
+        ->get();
+
+    // Fetch the final assessment booking if it exists
+    $finalAssessment = FinalAssessment::where('student_id', $user->id)->first();
+
+    return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses', 'coursePaymentStatus', 'canTakeFinal', 'selectedCourseId', 'eligibleCourses', 'finalAssessment'));
+}
 
 
     public function chooseTutor(Request $request)

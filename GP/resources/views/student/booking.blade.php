@@ -467,76 +467,76 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
-$(function() {
-    $("#date, #edit_date").datepicker({
-        dateFormat: 'yy-mm-dd',
-        minDate: 3, // 72 hours minimum
-        beforeShowDay: function(date) {
-            var day = date.getDay();
-            return [(day != 0), '']; // Disable Sundays
-        }
-    });
+    $(function() {
+        $("#date, #edit_date").datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: 3, // 72 hours minimum
+            beforeShowDay: function(date) {
+                var day = date.getDay();
+                return [(day != 0), '']; // Disable Sundays
+            }
+        });
 
-    $("#final_date").datepicker({
-        dateFormat: 'yy-mm-dd',
-        minDate: 3, // 72 hours minimum
-        beforeShowDay: function(date) {
-            var day = date.getDay();
-            return [day === 0, '']; // Enable only Sundays
-        }
-    });
+        $("#final_date").datepicker({
+            dateFormat: 'yy-mm-dd',
+            minDate: 3, // 72 hours minimum
+            beforeShowDay: function(date) {
+                var day = date.getDay();
+                return [day === 0, '']; // Enable only Sundays
+            }
+        });
 
-    $('#book-final-button').on('click', function() {
-        let selectedDate = $('#final_date').datepicker('getDate');
-        if (selectedDate) {
-            $.ajax({
-                url: '{{ route("schedule_final") }}',
-                method: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    course_id: $('#course_id').val(),
-                    final_date: $('#final_date').val(),
-                    final_statusA: 'pending',
-                    final_statusB: 'pending'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('#book-final-button').hide();
-                        $('#final_date').prop('disabled', true);
-                        $('#upload_course_id').val($('#course_id').val());
-                        $('#final-upload-section').show();
-                        alert('Final assessment booked successfully.');
-                    } else {
-                        alert('An error occurred while booking the final assessment: ' + response.message);
+        $('#book-final-button').on('click', function() {
+            let selectedDate = $('#final_date').datepicker('getDate');
+            if (selectedDate) {
+                $.ajax({
+                    url: '{{ route("schedule_final") }}',
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        course_id: $('#course_id').val(),
+                        final_date: $('#final_date').val(),
+                        final_statusA: 'pending',
+                        final_statusB: 'pending'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#book-final-button').hide();
+                            $('#final_date').prop('disabled', true);
+                            $('#upload_course_id').val($('#course_id').val());
+                            $('#final-upload-section').show();
+                            alert('Final assessment booked successfully.');
+                        } else {
+                            alert('An error occurred while booking the final assessment: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = xhr.status + ': ' + xhr.statusText;
+                        alert('Error - ' + errorMessage);
                     }
-                },
-                error: function(xhr, status, error) {
-                    let errorMessage = xhr.status + ': ' + xhr.statusText;
-                    alert('Error - ' + errorMessage);
-                }
-            });
+                });
+            }
+        });
+
+        function checkFinalUploadAvailability() {
+            let currentDate = new Date();
+            let bookingDate = new Date($('#final_date').datepicker('getDate'));
+            bookingDate.setHours(9, 0, 0, 0); // Set booking date to 9 AM
+
+            if (currentDate >= bookingDate) {
+                $('#proofA').prop('disabled', false);
+                $('#proofB').prop('disabled', false);
+            } else {
+                $('#proofA').prop('disabled', true);
+                $('#proofB').prop('disabled', true);
+            }
         }
+
+        setInterval(checkFinalUploadAvailability, 60000); // Check every minute
+
+        // Ensure the upload section is properly enabled/disabled on page load
+        checkFinalUploadAvailability();
     });
-
-    function checkFinalUploadAvailability() {
-        let currentDate = new Date();
-        let bookingDate = new Date($('#final_date').datepicker('getDate'));
-        bookingDate.setHours(9, 0, 0, 0); // Set booking date to 9 AM
-
-        if (currentDate >= bookingDate) {
-            $('#proofA').prop('disabled', false);
-            $('#proofB').prop('disabled', false);
-        } else {
-           // $('#proofA').prop('disabled', true);
-          //  $('#proofB').prop('disabled', true);
-        }
-    }
-
-    setInterval(checkFinalUploadAvailability, 60000); // Check every minute
-
-    // Ensure the upload section is properly enabled/disabled on page load
-    checkFinalUploadAvailability();
-});
 
     function editBooking(id, date, time) {
         $('#edit_date').val(date);
@@ -547,7 +547,7 @@ $(function() {
 
     function confirmDelete(id) {
         $('#deleteBookingId').val(id);
-        $('#deleteBookingForm').attr('action', '/delete-booking/' + id);
+        $('#deleteBookingForm').attr('action', '{{ url("delete-booking") }}/' + id);
         $('#deleteBookingModal').show();
     }
 
