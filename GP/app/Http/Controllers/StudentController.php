@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use App\Http\Controllers\Log;
+
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class StudentController extends Controller
 {
@@ -362,39 +364,28 @@ class StudentController extends Controller
 
 
     public function uploadLesen(Request $request)
-{
-    // Check if the form is being submitted and the data is being received
-    // dd($request->all());
+    {
+        $request->validate([
+            'lesen_picture' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+            'lesen_picture_date' => 'required|date',
+        ]);
 
-    $request->validate([
-        'lesen_picture' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
-        'lesen_picture_date' => 'required|date',
-    ]);
+        $student = Auth::guard('student')->user();
 
-    // Check if validation passes
-    // dd('Validation passed');
+        if ($request->hasFile('lesen_picture')) {
+            $fileName = time() . '.' . $request->lesen_picture->getClientOriginalExtension();
+            $filePath = $request->lesen_picture->storeAs('public/lesen_picture', $fileName);
 
-    $student = Auth::guard('student')->user();
+            $student->lesen_picture = $fileName;
+            $student->lesen_picture_date = $request->lesen_picture_date;
+            $student->lesen_picture_status = 'pending';
+            $student->next_upload_due_date = Carbon::now()->addMinutes(3);
+            $student->save();
 
-    if ($request->hasFile('lesen_picture')) {
-        // Check if the file is being received correctly
-        // dd('File received', $request->file('lesen_picture'));
+        }
 
-        // Save the file to the public storage directory
-        $fileName = time() . '.' . $request->lesen_picture->getClientOriginalExtension();
-        $filePath = $request->lesen_picture->storeAs('public/lesen_picture', $fileName);
-
-        $student->lesen_picture = $fileName;
-        $student->lesen_picture_date = $request->lesen_picture_date;
-        $student->lesen_picture_status = 'pending';
-        $student->save();
-
-        // Check if the student data is being saved correctly
-        // dd('Student data saved', $student);
+        return redirect()->back()->with('success', 'Lesen picture and date uploaded successfully.');
     }
-
-    return redirect()->back()->with('success', 'Lesen picture and date uploaded successfully.');
-}
 
 
 }

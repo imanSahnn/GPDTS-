@@ -15,10 +15,11 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $pendingApprovals = Student::where('lesen_picture_status', 'pending')->get();
-
-        return view('admin.homepage', compact('pendingApprovals'));
+        $pendingStudents = Student::where('lesen_picture_status', 'pending')->get();
+        $dueTodayStudents = Student::where('next_upload_due_date', Carbon::today()->toDateString())->get();
+        return view('admin.homepage', compact('pendingStudents', 'dueTodayStudents'));
     }
+
     public function handleApproval(Request $request, $id)
     {
         $student = Student::findOrFail($id);
@@ -26,6 +27,7 @@ class HomeController extends Controller
         if ($request->input('action') == 'approve') {
             $student->lesen_picture_status = 'approved';
             $student->status = 'active';
+            $student->next_upload_due_date = $request->input('next_upload_due_date');
         } else {
             // Remove the file
             if (Storage::exists('public/lesen_picture/' . $student->lesen_picture)) {
@@ -36,12 +38,14 @@ class HomeController extends Controller
             $student->status = 'inactive';
             $student->lesen_picture = null;
             $student->lesen_picture_date = null;
+            $student->next_upload_due_date = null;
         }
 
         $student->save();
 
-        return back()->with('status', 'Student status updated successfully.');
+        return redirect()->route('admin.showApprovalForm')->with('status', 'Student status updated successfully.');
     }
+
     public function student()
     {
         $students = Student::with('courses')->get();

@@ -14,7 +14,7 @@ class Student extends Authenticatable
     protected $table = 'students';
 
     protected $fillable = [
-        'name', 'email', 'password', 'ic', 'number', 'picture', 'lesen_picture','lesen_picture_date','lesen_picture_status','course_id', 'status', 'result'
+        'name', 'email', 'password', 'ic', 'number', 'picture', 'lesen_picture','lesen_picture_date','lesen_picture_status','next_upload_due_date','course_id', 'status', 'result'
     ];
 
     public function courses()

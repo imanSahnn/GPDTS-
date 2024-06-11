@@ -39,8 +39,11 @@ Route::get('/admin/tutors/pending', [HomeController::class, 'pendingTutors'])->n
 Route::post('/admin/tutors/approve/{id}', [HomeController::class, 'approveTutor'])->name('admin.tutors.approve');
 Route::post('/admin/tutors/reject/{id}', [HomeController::class, 'rejectTutor'])->name('admin.tutors.reject');
 Route::put('/admin/toggle-status/{id}', [StudentController::class, 'toggleStatus'])->name('admin.toggleStatus');
-Route::put('/admin/approve/{id}', [HomeController::class, 'handleApproval'])->name('admin.approve');
+// Route to show the approval form
+Route::get('/admin/approve-uploads', [HomeController::class, 'index'])->name('admin.showApprovalForm');
 
+// Route to handle the approval action
+Route::put('/admin/approve/{id}', [HomeController::class, 'handleApproval'])->name('admin.approve');
 //reprot
 Route::get('/reports', [ReportController::class, 'index'])->name('report.index');
 Route::post('/reports/generate', [ReportController::class, 'generateReport'])->name('admin.reportresult');
