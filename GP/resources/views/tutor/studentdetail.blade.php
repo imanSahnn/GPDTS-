@@ -123,7 +123,6 @@
                                 <select name="skills[{{ $progress->id }}]" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" {{ $isEditable ? '' : 'disabled' }}>
                                     <option value="in_progress" {{ $progress->status_skill == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                     <option value="pass" {{ $progress->status_skill == 'pass' ? 'selected' : '' }}>Pass</option>
-                                    <option value="fail" {{ $progress->status_skill == 'fail' ? 'selected' : '' }}>Fail</option>
                                 </select>
                             </li>
                         @endforeach
@@ -138,8 +137,7 @@
     @endsection
 
     <script>
-
-
+        document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('form').forEach(form => {
                 form.addEventListener('submit', function (event) {
                     const saveButton = form.querySelector('button[type="submit"]');

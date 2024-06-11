@@ -25,7 +25,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach($approvedBookings as $booking)
                     <div class="bg-white p-6 rounded-lg shadow-lg">
-
                         <h2 class="text-2xl font-bold mb-2 text-gray-800">{{ $booking->tutor->name }}</h2>
                         <p class="text-gray-600 mb-2">Course: {{ $booking->course->name }}</p>
                         <p class="text-gray-600 mb-2">Date: {{ $booking->date }}</p>
@@ -63,18 +62,16 @@
             var chart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['In Progress', 'Pass', 'Fail'],
+                    labels: ['In Progress', 'Pass'],
                     datasets: [{
                         label: 'Learning Progress',
                         data: [
                             {{ $progressData['in_progress'] ?? 0 }},
-                            {{ $progressData['pass'] ?? 0 }},
-                            {{ $progressData['fail'] ?? 0 }}
+                            {{ $progressData['pass'] ?? 0 }}
                         ],
                         backgroundColor: [
                             '#FFCE56',
-                            '#36A2EB',
-                            '#FF6384'
+                            '#36A2EB'
                         ]
                     }]
                 },
@@ -100,8 +97,7 @@
                     .then(data => {
                         chart.data.datasets[0].data = [
                             data.progressData['in_progress'] || 0,
-                            data.progressData['pass'] || 0,
-                            data.progressData['fail'] || 0
+                            data.progressData['pass'] || 0
                         ];
                         chart.update();
                     });

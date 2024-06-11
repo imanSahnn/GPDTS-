@@ -56,7 +56,7 @@ class LearningProgressController extends Controller
     {
         $request->validate([
             'skills' => 'required|array',
-            'skills.*' => 'required|in:pass,fail,in_progress',
+            'skills.*' => 'required|in:pass,in_progress',
         ]);
 
         foreach ($request->skills as $id => $status) {

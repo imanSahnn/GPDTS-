@@ -12,7 +12,7 @@
             min-height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #dc7f57; /* Background color for the body */
+            background-color: #f29090; /* Background color for the body */
         }
         .sidebar {
             width: 250px;
@@ -33,7 +33,7 @@
             display: flex;
             align-items: center;
             padding: 10px 15px;
-            color: #333;
+            color: #ffffff;
             text-decoration: none;
         }
         .nav-link:hover {
@@ -60,6 +60,10 @@
         .alert-success {
             background-color: #FFCF9D; /* Alert success background color */
             color: white;
+        }
+        .highlight-red {
+            background-color: #ffcccc; /* Light red background for visibility */
+            color: #990000; /* Dark red text for contrast */
         }
     </style>
 </head>

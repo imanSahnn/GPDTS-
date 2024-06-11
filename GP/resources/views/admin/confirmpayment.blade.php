@@ -24,7 +24,9 @@
         </div>
     @endif
 
-    <div class="overflow-x-auto">
+    <!-- Regular Payments Section -->
+    <h2 class="text-2xl font-bold mb-4 text-gray-800">Regular Payments</h2>
+    <div class="overflow-x-auto mb-8">
         <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
             <thead>
                 <tr>
@@ -60,9 +62,7 @@
                             <span class="text-gray-500">{{ ucfirst($payment->status) }}</span>
                         @endif
                     </td>
-
                 </tr>
-
                 @empty
                 <tr>
                     <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">No payments found.</td>
@@ -71,16 +71,48 @@
             </tbody>
         </table>
     </div>
-</div>
 
-<script>
-    function toggleDetails(id) {
-        const detailsRow = document.getElementById(`details-${id}`);
-        if (detailsRow.style.display === 'none') {
-            detailsRow.style.display = 'table-row';
-        } else {
-            detailsRow.style.display = 'none';
-        }
-    }
-</script>
+    <!-- Penalty Payments Section -->
+    <h2 class="text-2xl font-bold mb-4 text-red-800">Penalty Payments</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead>
+                <tr>
+                    <th class="px-6 py-3 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Student Name</th>
+                    <th class="px-6 py-3 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Course</th>
+                    <th class="px-6 py-3 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Total Payment</th>
+                    <th class="px-6 py-3 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Payment Proof</th>
+                    <th class="px-6 py-3 bg-gray-200 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($penaltyPayments as $penaltyPayment)
+                <tr class="{{ $penaltyPayment->status === 'pending' ? 'bg-yellow-100' : ($penaltyPayment->status === 'approved' ? 'bg-green-100' : 'bg-red-100') }}">
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $penaltyPayment->student->name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ $penaltyPayment->course->name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${{ $penaltyPayment->total_payment }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ asset('storage/' . $penaltyPayment->payment_proof) }}" target="_blank" class="text-blue-500 hover:text-blue-700">View Proof</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        @if($penaltyPayment->status === 'pending')
+                            <form action="{{ route('approve_penalty_payment', $penaltyPayment->id) }}" method="POST" class="inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Approve</button>
+                            </form>
+                        @else
+                            <span class="text-gray-500">{{ ucfirst($penaltyPayment->status) }}</span>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">No penalty payments found.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 @endsection

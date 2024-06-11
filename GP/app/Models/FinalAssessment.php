@@ -29,4 +29,17 @@ class FinalAssessment extends Model
 {
     return $this->belongsTo(Course::class);
 }
+public function getRequiredPaymentAttribute()
+{
+    $course = $this->course;
+    $percentage = 0;
+
+    if ($this->final_statusA === 'failed' && $this->final_statusB === 'failed') {
+        $percentage = 0.30;
+    } elseif ($this->final_statusA === 'failed' || $this->final_statusB === 'failed') {
+        $percentage = 0.15;
+    }
+
+    return $course->price * $percentage;
+}
 }

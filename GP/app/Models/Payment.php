@@ -20,6 +20,7 @@ class Payment extends Model
         'payment_proof',
         'status',
         'invoice',
+        'payment_penalty',
     ];
 
     public function student()

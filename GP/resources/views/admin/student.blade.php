@@ -13,10 +13,7 @@
         <div class="container">
             <div class="row">
                 <div class="col">
-                    <h1>student Page</h1>
-                </div>
-                <div class="col text-right">
-                    <a href="{{ route('admin.createstudent') }}" class="btn btn-primary">Add New student</a>
+                    <h1>Student Page</h1>
                 </div>
             </div>
 
@@ -36,7 +33,7 @@
                     </thead>
                     <tbody>
                         @foreach ($students as $student)
-                            <tr>
+                            <tr class="{{ $student->deactivationRequired ? 'highlight-red' : '' }}">
                                 <td>{{ $student->id }}</td>
                                 <td>
                                     @if($student->picture)
@@ -55,6 +52,15 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                    <form action="{{ route('admin.toggleStatus', $student->id) }}" method="POST" style="display: inline-block;">
+                                        @csrf
+                                        @method('PUT')
+                                        @if($student->status == 'active')
+                                            <button type="submit" class="btn btn-sm btn-warning">Deactivate</button>
+                                        @else
+                                            <button type="submit" class="btn btn-sm btn-success">Activate</button>
+                                        @endif
                                     </form>
                                 </td>
                             </tr>

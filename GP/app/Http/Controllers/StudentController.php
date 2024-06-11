@@ -6,13 +6,15 @@ use App\Models\Booking;
 use App\Models\Student;
 use App\Models\Course;
 use App\Models\Tutor;
+use App\Models\Payment;
+use App\Models\StudentCourseSkill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use App\Models\StudentCourseSkill;
+use App\Http\Controllers\Log;
 
 class StudentController extends Controller
 {
@@ -28,6 +30,8 @@ class StudentController extends Controller
         $approvedBookings = Booking::where('student_id', $user->id)
             ->where('status', 'approved')
             ->with('tutor', 'course')
+            ->orderBy('date', 'asc')
+            ->orderBy('time', 'asc')
             ->get();
 
         // Fetch courses for the user
@@ -76,11 +80,12 @@ class StudentController extends Controller
         // Validate the request data
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'password' => 'required|string|confirmed|min:8',
+            'password' => 'nullable|string|confirmed|min:8',
             'email' => 'required|email|max:255|unique:students,email,' . $student->id,
             'ic' => 'required|string|max:20|unique:students,ic,' . $student->id,
             'number' => 'required|string|max:15',
             'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'lesen_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'course_id' => 'required|exists:courses,id',
         ]);
 
@@ -97,15 +102,54 @@ class StudentController extends Controller
             $student->picture = $imagePath;
         }
 
+        // Handle lesen_picture upload
+        if ($request->hasFile('lesen_picture')) {
+            $lesenImagePath = $request->file('lesen_picture')->store('lesen_pictures', 'public');
+            $student->lesen_picture = $lesenImagePath;
+        }
+
         $student->save();
 
         return redirect()->route('admin.editstudent', $student->id)->with('success', 'Student updated successfully.');
     }
 
-
-    public function show(Student $student)
+    public function show($id)
     {
-        return view('admin.viewstudent', ['student' => $student]);
+        $student = Student::with('courses')->findOrFail($id);
+
+        // Get unique courses
+        $uniqueCourses = $student->courses->unique('id');
+
+        // Add first payment date to each unique course
+        foreach ($uniqueCourses as $course) {
+            $firstPayment = Payment::where('student_id', $student->id)
+                ->where('course_id', $course->id)
+                ->orderBy('created_at', 'asc')
+                ->first();
+            $course->firstPaymentDate = $firstPayment ? $firstPayment->created_at : null;
+        }
+
+        return view('admin.viewstudent', ['student' => $student, 'uniqueCourses' => $uniqueCourses]);
+    }
+
+    public function deactivateCourse($studentId, $courseId)
+    {
+        $student = Student::findOrFail($studentId);
+
+        // Delete payments related to the student and course
+        Payment::where('student_id', $student->id)
+            ->where('course_id', $courseId)
+            ->delete();
+
+        // Delete bookings related to the student and course
+        Booking::where('student_id', $student->id)
+            ->where('course_id', $courseId)
+            ->delete();
+
+        // Remove the course from the student's courses (without deleting the course itself)
+        $student->courses()->detach($courseId);
+
+        return redirect()->back()->with('success', 'Course deactivated and related data deleted successfully.');
     }
 
     public function destroy($id)
@@ -118,6 +162,7 @@ class StudentController extends Controller
         // Redirect to a specific route with a success message
         return redirect()->route('student')->with('success', 'Student deleted successfully.');
     }
+
     public function create()
     {
         $courses = Course::all();
@@ -168,6 +213,7 @@ class StudentController extends Controller
 
         return back()->withErrors(['error' => 'Invalid email or IC number.']);
     }
+
     public function showTutorList()
     {
         $user = Auth::guard('student')->user();
@@ -178,9 +224,8 @@ class StudentController extends Controller
             $tutor->average_rating = $tutor->ratings()->avg('rate'); // Calculate average rate
         }
 
-        return view('student.tutorlist', compact('tutors','profilePicture'));
+        return view('student.tutorlist', compact('tutors', 'profilePicture'));
     }
-
 
     public function courselist()
     {
@@ -224,6 +269,7 @@ class StudentController extends Controller
             return back()->withErrors(['message' => 'Failed to add course: ' . $e->getMessage()]);
         }
     }
+
     public function showLearningProgress()
     {
         $student = Auth::guard('student')->user();
@@ -237,7 +283,7 @@ class StudentController extends Controller
     {
         $student = Auth::guard('student')->user();
         $profilePicture = Student::where('id', $student->id)->value('picture');
-        return view('student.studentprofile', compact('student','profilePicture'));
+        return view('student.studentprofile', compact('student', 'profilePicture'));
     }
 
     public function updateProfile(Request $request)
@@ -245,10 +291,11 @@ class StudentController extends Controller
         $student = Auth::guard('student')->user();
 
         $request->validate([
-            'number' => 'required|string|max:15' ,
+            'number' => 'required|string|max:15',
             'email' => 'required|email|max:255|unique:students,email,' . $student->id,
             'password' => 'nullable|string|min:6|confirmed',
             'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'lesen_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $student->number = $request->number;
@@ -269,6 +316,17 @@ class StudentController extends Controller
             $student->picture = $picturePath;
         }
 
+        if ($request->hasFile('lesen_picture')) {
+            // Delete the old lesen picture if it exists
+            if ($student->lesen_picture) {
+                Storage::disk('public')->delete($student->lesen_picture);
+            }
+
+            // Store the new lesen picture
+            $lesenPicturePath = $request->file('lesen_picture')->store('lesen_pictures', 'public');
+            $student->lesen_picture = $lesenPicturePath;
+        }
+
         $student->save();
 
         return redirect()->route('student.profile')->with('success', 'Profile updated successfully.');
@@ -287,6 +345,19 @@ class StudentController extends Controller
         return view('final_assessments.index', compact('courses'));
     }
 
+    public function toggleStatus($id)
+{
+    $student = Student::findOrFail($id);
 
+    if ($student->status == 'active') {
+        $student->status = 'inactive';
+    } else {
+        $student->status = 'active';
+    }
+
+    $student->save();
+
+    return back()->with('success', 'Course and related skills successfully added!');
 }
 
+}

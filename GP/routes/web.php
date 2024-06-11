@@ -32,13 +32,14 @@ Route::delete('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/student', [HomeController::class, 'student'])->name('student');
 Route::get('/tutor', [HomeController::class, 'tutor'])->name('tutor');
 Route::get('/course', [HomeController::class, 'course'])->name('course');
-Route::get('/students', [HomeController::class, 'student'])->name('students'); //show student
 
 Route::get('/payment', [HomeController::class, 'payment'])->name('payment');
 
 Route::get('/admin/tutors/pending', [HomeController::class, 'pendingTutors'])->name('pendingTutors');
 Route::post('/admin/tutors/approve/{id}', [HomeController::class, 'approveTutor'])->name('admin.tutors.approve');
 Route::post('/admin/tutors/reject/{id}', [HomeController::class, 'rejectTutor'])->name('admin.tutors.reject');
+Route::put('/admin/toggle-status/{id}', [StudentController::class, 'toggleStatus'])->name('admin.toggleStatus');
+
 
 //reprot
 Route::get('/reports', [ReportController::class, 'index'])->name('report.index');
@@ -98,6 +99,10 @@ Route::post('/submit-final-assessment', [BookingController::class, 'submitFinalA
 
 Route::get('/final-assessment', [BookingController::class, 'showFinalAssessmentForm'])->name('final_assessment_form');
 
+Route::get('/admin/jpj', [HomeController::class, 'showFinalBookings'])->name('admin.jpj');
+Route::post('/admin/upload-final-files/{id}', [HomeController::class, 'uploadFinalFiles'])->name('admin.uploadFinalFiles');
+Route::post('/admin/update-status/{id}', [HomeController::class, 'updateStatus'])->name('admin.updateStatus');
+
 //student
 Route::post('/book-class', [BookingController::class, 'bookClass'])->name('book_class');
 Route::group(['middleware' => ['auth:student']], function () {
@@ -119,6 +124,8 @@ Route::post('/admin/storestudent', [AuthController::class, 'sstore'])->name('adm
 Route::get('/admin/editstudent/{student}', [StudentController::class, 'edit'])->name('admin.editstudent');
 Route::post('/admin/studentupdate/{student}', [StudentController::class, 'supdate'])->name('admin.supdate');
 Route::get('/admin/viewstudent/{student}', [StudentController::class, 'show'])->name('admin.viewstudent');
+Route::post('admin/deactivate-course/{studentId}/{courseId}', [StudentController::class, 'deactivateCourse'])->name('admin.deactivate-course');
+
 Route::delete('/admin/destroy/{student}', [StudentController::class, 'destroy'])->name('admin.destroy');
 
 Route::get('student/booking', [BookingController::class, 'create'])->name('student.booking.create');
@@ -162,12 +169,19 @@ Route::delete('/admin/destroy/{course}', [CourseController::class, 'destroy'])->
 
 //payment
 
-    Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('show_payment_form');
-    Route::post('/submit-payment', [PaymentController::class, 'submitPayment'])->name('submit_payment');
+   // Payment-related routes
+Route::get('/payment', [PaymentController::class, 'showPaymentForm'])->name('show_payment_form');
+Route::post('/submit-payment', [PaymentController::class, 'submitPayment'])->name('submit_payment');
 
-    Route::get('/confirm-payment', [PaymentController::class, 'showConfirmPayment'])->name('show_confirm_payment');
-    Route::patch('/approve-payment/{id}', [PaymentController::class, 'approvePayment'])->name('admin.approve_payment');
-    Route::patch('/reject-payment/{id}', [PaymentController::class, 'rejectPayment'])->name('admin.reject_payment');
+Route::get('/confirm-payment', [PaymentController::class, 'showConfirmPayment'])->name('show_confirm_payment');
+Route::patch('/approve-payment/{id}', [PaymentController::class, 'approvePayment'])->name('admin.approve_payment');
+Route::patch('/reject-payment/{id}', [PaymentController::class, 'rejectPayment'])->name('admin.reject_payment');
+
+Route::post('/submit_additional_payment', [PaymentController::class, 'submitAdditionalPayment'])->name('submit_additional_payment');
+Route::post('/submit-penalty-payment', [PaymentController::class, 'submitPenaltyPayment'])->name('submit_penalty_payment');
+
+Route::get('/confirm-payments', [PaymentController::class, 'showConfirmPayment'])->name('confirm_payments');
+Route::patch('/approve-penalty-payment/{id}', [PaymentController::class, 'approvePenaltyPayment'])->name('approve_penalty_payment');
 
     //rating
     Route::post('/submit-review/{id}', [BookingController::class, 'submitReview'])->name('submit_review');

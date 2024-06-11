@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -6,9 +7,9 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Course;
 use App\Models\Payment;
 use App\Models\Student;
+use App\Models\FinalAssessment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Mail\InvoiceMail;
 
 class PaymentController extends Controller
 {
@@ -17,9 +18,7 @@ class PaymentController extends Controller
         $student = Auth::guard('student')->user();
         $profilePicture = Student::where('id', $student->id)->value('picture');
         $courses = $student->courses()->distinct()->with('payments')->get();
-        return view('student.payment', compact('courses', 'student','profilePicture'));
-
-
+        return view('student.payment', compact('courses', 'student', 'profilePicture'));
     }
 
     public function submitPayment(Request $request)
@@ -43,7 +42,7 @@ class PaymentController extends Controller
             'name' => $student->name,
             'ic' => $student->ic,
             'total_payment' => $request->total_payment,
-            'current_total' => null,  // Do not set current_total here
+            'current_total' => null,
             'total_course_price' => $course->price,
             'payment_proof' => $proofPath,
             'status' => 'pending',
@@ -52,13 +51,22 @@ class PaymentController extends Controller
         return redirect()->back()->with('success', 'Payment submitted successfully. Awaiting approval.');
     }
 
-
     public function showConfirmPayment()
     {
         $payments = Payment::with(['student', 'course'])
+        ->where(function ($query) {
+            $query->where('payment_type', '!=', 'penalty')
+                  ->orWhereNull('payment_type');
+        })
         ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
         ->get();
-        return view('admin.confirmpayment', compact('payments'));
+
+        $penaltyPayments = Payment::with(['student', 'course'])
+            ->where('payment_type', 'penalty')
+            ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
+            ->get();
+
+        return view('admin.confirmpayment', compact('payments', 'penaltyPayments'));
     }
 
     public function approvePayment($id)
@@ -67,37 +75,91 @@ class PaymentController extends Controller
         $student = $payment->student;
         $course = $payment->course;
 
-        // Calculate the current total after approval
         $currentTotal = $student->payments()
             ->where('course_id', $course->id)
             ->where('status', 'approved')
+            ->where('payment_type', '!=', 'penalty')
             ->sum('total_payment') + $payment->total_payment;
 
-        // Update payment status to approved and set current_total
         $payment->update([
             'status' => 'approved',
             'current_total' => $currentTotal
         ]);
 
-        // Generate PDF
         $pdf = Pdf::loadView('admin.invoice', compact('payment'));
 
-        // Save PDF to storage
         $filePath = 'invoices/' . $payment->id . '_invoice.pdf';
         Storage::disk('public')->put($filePath, $pdf->output());
 
-        // Update payment with the invoice path
         $payment->update(['invoice' => $filePath]);
 
         return redirect()->back()->with('success', 'Payment approved successfully and invoice saved.');
     }
 
     public function rejectPayment($id)
-{
-    $payment = Payment::findOrFail($id);
-    $payment->status = 'rejected';
-    $payment->save();
+    {
+        $payment = Payment::findOrFail($id);
+        $payment->status = 'rejected';
+        $payment->save();
 
-    return redirect()->back()->with('success', 'Payment rejected successfully.');
-}
+        return redirect()->back()->with('success', 'Payment rejected successfully.');
+    }
+
+    public function submitPenaltyPayment(Request $request)
+    {
+        $request->validate([
+            'final_assessment_id' => 'required|exists:finals,id',
+            'proof' => 'required|file|mimes:jpg,jpeg,png,pdf',
+            'total_amount' => 'required|numeric',
+        ]);
+
+        $finalAssessment = FinalAssessment::findOrFail($request->final_assessment_id);
+
+        $penaltyPayment = new Payment();
+        $penaltyPayment->student_id = Auth::guard('student')->id();
+        $penaltyPayment->course_id = $finalAssessment->course_id;
+        $penaltyPayment->total_payment = $request->total_amount;
+        $penaltyPayment->payment_type = 'penalty';
+        $penaltyPayment->status = 'pending';
+
+        if ($request->hasFile('proof')) {
+            $proofPath = $request->file('proof')->store('penalty_payments');
+            $penaltyPayment->payment_proof = $proofPath;
+        }
+
+        $penaltyPayment->save();
+
+        return redirect()->back()->with('success', 'Penalty payment submitted successfully.');
+    }
+
+    public function showPenaltyPayments()
+    {
+        $penaltyPayments = Payment::where('payment_type', 'penalty')->where('status', 'pending')->with('student', 'course')->get();
+        return view('admin.penalty_payments', compact('penaltyPayments'));
+    }
+
+    public function approvePenaltyPayment($id)
+    {
+        $payment = Payment::findOrFail($id);
+        $payment->status = 'approved';
+        $payment->save();
+
+        $finalAssessment = FinalAssessment::where('id', $payment->final_assessment_id)->first();
+        if ($finalAssessment) {
+            // Save the previous status of A and B
+            $finalStatusA = $finalAssessment->final_statusA;
+            $finalStatusB = $finalAssessment->final_statusB;
+            $finalAssessment->delete();
+
+            // Create a new final assessment entry with pending status and the same statuses of A and B
+            $newFinalAssessment = new FinalAssessment();
+            $newFinalAssessment->student_id = $payment->student_id;
+            $newFinalAssessment->course_id = $payment->course_id;
+            $newFinalAssessment->final_statusA = $finalStatusA;
+            $newFinalAssessment->final_statusB = $finalStatusB;
+            $newFinalAssessment->save();
+        }
+
+        return redirect()->back()->with('success', 'Penalty payment approved. The student can now book the final assessment again.');
+    }
 }

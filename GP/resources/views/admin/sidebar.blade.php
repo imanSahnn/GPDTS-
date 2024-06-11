@@ -55,7 +55,7 @@
         </li>
         <li class="nav-item">
             <a href="{{ route('course') }}" class="nav-link {{ request()->is('course') ? 'active' : '' }}">
-                <i class="bi bi-book-fill"></i> <span>Course</span>
+                <i class="bi bi-book-half"></i> <span>Course</span>
             </a>
         </li>
         <li class="nav-item">
@@ -71,6 +71,11 @@
         <li class="nav-item">
             <a href="{{ route('report.index') }}" class="nav-link {{ request()->is('admin/reports') ? 'active' : '' }}">
                 <i class="bi bi-file-earmark-text-fill"></i> <span>Report</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.jpj') }}" class="nav-link {{ request()->is('/admin/jpj') ? 'active' : '' }}">
+                <i class="bi bi-calendar-range-fill"></i> <span>JPJ Test</span>
             </a>
         </li>
     </ul>
