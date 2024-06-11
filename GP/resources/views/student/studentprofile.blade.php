@@ -64,18 +64,6 @@
             @endif
 
             <div class="mb-4">
-                <label class="block text-gray-700 font-bold mb-2" for="lesen_picture">Lesen Picture:</label>
-                <input type="file" id="lesen_picture" name="lesen_picture" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </div>
-
-            @if($student->lesen_picture)
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-bold mb-2">Current Lesen Picture:</label>
-                    <img src="{{ asset('storage/' . $student->lesen_picture) }}" alt="Lesen Picture" class="rounded-full w-32 h-32">
-                </div>
-            @endif
-
-            <div class="mb-4">
                 <label class="block text-gray-700 font-bold mb-2">Courses:</label>
                 <ul>
                     @foreach($student->courses->unique('id') as $course)

@@ -1,38 +1,34 @@
-<!-- resources/views/home.blade.php -->
 @extends('admin.layout')
 
 @section('title', 'Home')
 
 @section('content')
-    <div class="grid">
-        <section>
-            <hgroup>
-                <h2>Welcome to My Laravel App</h2>
-                <h3>Home Page</h3>
-            </hgroup>
-            <p>This is the home page of your Laravel application.</p>
-            <figure>
-                <img src="https://via.placeholder.com/600x400" alt="Placeholder Image">
-                <figcaption><a href="https://unsplash.com" target="_blank">Image Source</a></figcaption>
-            </figure>
-            <h3>Section Heading</h3>
-            <p>Some more content goes here.</p>
-            <h3>Another Heading</h3>
-            <p>Even more content goes here.</p>
-        </section>
-    </div>
-    <section aria-label="Subscribe example">
+
+
+    <!-- Pending Approvals Section -->
+    <section aria-label="Pending Approvals">
         <div class="container">
             <article>
                 <hgroup>
-                    <h2>Subscribe to our newsletter</h2>
-                    <h3>Stay updated with our latest news</h3>
+                    <h2>Pending Approvals</h2>
                 </hgroup>
-                <form class="grid">
-                    <input type="text" id="firstname" name="firstname" placeholder="First Name" aria-label="First Name" required />
-                    <input type="email" id="email" name="email" placeholder="Email Address" aria-label="Email Address" required />
-                    <button type="submit" onclick="event.preventDefault()">Subscribe</button>
-                </form>
+                <div class="grid">
+                    @foreach($pendingApprovals as $student)
+                        <div class="approval-item">
+                            <h3>{{ $student->name }}</h3>
+                            <p>Date: {{ $student->lesen_picture_date }}</p>
+                            <figure>
+                                <img src="{{ Storage::url('lesen_picture/' . $student->lesen_picture) }}" alt="Lesen Picture">
+                            </figure>
+                            <form action="{{ route('admin.approve', $student->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" name="action" value="approve" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Approve</button>
+                                <button type="submit" name="action" value="reject" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Reject</button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
             </article>
         </div>
     </section>

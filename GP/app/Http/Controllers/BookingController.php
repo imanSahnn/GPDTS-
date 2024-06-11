@@ -120,19 +120,24 @@ class BookingController extends Controller
     }
     public function bookClass(Request $request)
     {
+        $student = Auth::guard('student')->user();
+
+        if ($student->status !== 'active') {
+            return redirect()->back()->with('error', 'Your account is inactive. You cannot book a tutor.');
+        }
+
         $request->validate([
-            'tutor_id' => 'required|exists:tutor,id',
-            'course_id' => 'required|exists:course,id',
+            'tutor_id' => 'required|exists:tutors,id',
+            'course_id' => 'required|exists:courses,id',
             'date' => 'required|date',
             'time' => 'required',
         ]);
 
-        $studentId = auth()->guard('student')->id();
         $date = Carbon::parse($request->input('date'))->format('Y-m-d');
         $time = $request->input('time');
 
         // Check for existing bookings with the same date and time
-        $existingBooking = Booking::where('student_id', $studentId)
+        $existingBooking = Booking::where('student_id', $student->id)
                                   ->where('date', $date)
                                   ->where('time', $time)
                                   ->whereIn('status', ['pending', 'approved'])
@@ -144,7 +149,7 @@ class BookingController extends Controller
 
         // Create the new booking
         Booking::create([
-            'student_id' => $studentId,
+            'student_id' => $student->id,
             'tutor_id' => $request->input('tutor_id'),
             'course_id' => $request->input('course_id'),
             'date' => $date,

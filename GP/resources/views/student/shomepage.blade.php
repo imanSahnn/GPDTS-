@@ -15,6 +15,38 @@
     @section('content')
     <div class="container mx-auto mt-8 px-4">
         <h2 class="text-3xl font-bold text-center mt-8">Welcome to the Homepage</h2>
+    <!-- Lesen Picture and Date Upload Section -->
+    <div class="mb-8">
+        <h3 class="text-2xl font-bold mb-4">Upload Lesen Picture and Date</h3>
+        @if($student->lesen_picture_status == 'rejected' || !$student->lesen_picture)
+            <form action="{{ route('uploadLesen') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="lesen_picture">Lesen Picture:</label>
+                    <input type="file" id="lesen_picture" name="lesen_picture" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="lesen_picture_date">Date:</label>
+                    <input type="date" id="lesen_picture_date" name="lesen_picture_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        @else
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2">Current Lesen Picture:</label>
+                <img src="{{ asset('storage/' . $student->lesen_picture) }}" alt="Lesen Picture" class="rounded-full w-32 h-32">
+            </div>
+            @if($student->lesen_picture_status == 'pending')
+                <p class="text-yellow-500 font-bold">Your submission is pending.</p>
+            @elseif($student->lesen_picture_status == 'approved')
+                <p class="text-green-500 font-bold">Your submission is approved.</p>
+            @endif
+        @endif
+    </div>
 
         <!-- Approved Bookings Section -->
         <div class="mt-12">

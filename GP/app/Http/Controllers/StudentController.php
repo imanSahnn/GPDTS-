@@ -19,30 +19,37 @@ use App\Http\Controllers\Log;
 class StudentController extends Controller
 {
     public function index()
-    {
-        // Retrieve the authenticated user
-        $user = Auth::guard('student')->user();
+{
+    $student = Auth::guard('student')->user();
 
-        // Retrieve the user's profile picture filename
-        $profilePicture = Student::where('id', $user->id)->value('picture');
+    // Retrieve the user's profile picture filename
+    $profilePicture = $student->picture;
 
-        // Fetch approved bookings
-        $approvedBookings = Booking::where('student_id', $user->id)
-            ->where('status', 'approved')
-            ->with('tutor', 'course')
-            ->orderBy('date', 'asc')
-            ->orderBy('time', 'asc')
-            ->get();
+    // Fetch approved bookings
+    $approvedBookings = Booking::where('student_id', $student->id)
+        ->where('status', 'approved')
+        ->with('tutor', 'course')
+        ->orderBy('date', 'asc')
+        ->orderBy('time', 'asc')
+        ->get();
 
-        // Fetch courses for the user
-        $courses = $user->courses()->distinct()->get();
+    // Fetch courses for the user
+    $courses = $student->courses()->distinct()->get();
 
-        // Fetch learning progress data for the first course as default
-        $selectedCourseId = $courses->first()->id ?? null;
-        $progressData = $this->getProgressData($user->id, $selectedCourseId);
+    // Fetch learning progress data for the first course as default
+    $selectedCourseId = $courses->first()->id ?? null;
+    $progressData = $this->getProgressData($student->id, $selectedCourseId);
 
-        return view('student.shomepage', compact('profilePicture', 'approvedBookings', 'courses', 'selectedCourseId', 'progressData'));
-    }
+    return view('student.shomepage', compact(
+        'student', // Pass the user as the student variable
+        'profilePicture',
+        'approvedBookings',
+        'courses',
+        'selectedCourseId',
+        'progressData'
+    ));
+}
+
 
     private function getProgressData($studentId, $courseId)
     {
@@ -295,7 +302,6 @@ class StudentController extends Controller
             'email' => 'required|email|max:255|unique:students,email,' . $student->id,
             'password' => 'nullable|string|min:6|confirmed',
             'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'lesen_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $student->number = $request->number;
@@ -314,17 +320,6 @@ class StudentController extends Controller
             // Store the new picture
             $picturePath = $request->file('picture')->store('profile_pictures', 'public');
             $student->picture = $picturePath;
-        }
-
-        if ($request->hasFile('lesen_picture')) {
-            // Delete the old lesen picture if it exists
-            if ($student->lesen_picture) {
-                Storage::disk('public')->delete($student->lesen_picture);
-            }
-
-            // Store the new lesen picture
-            $lesenPicturePath = $request->file('lesen_picture')->store('lesen_pictures', 'public');
-            $student->lesen_picture = $lesenPicturePath;
         }
 
         $student->save();
@@ -346,18 +341,60 @@ class StudentController extends Controller
     }
 
     public function toggleStatus($id)
-{
-    $student = Student::findOrFail($id);
+    {
+        $student = Student::findOrFail($id);
 
-    if ($student->status == 'active') {
-        $student->status = 'inactive';
-    } else {
-        $student->status = 'active';
+        if ($student->status == 'active') {
+            $student->status = 'inactive';
+
+            // Delete all future bookings
+            Booking::where('student_id', $student->id)
+                ->where('date', '>', now())
+                ->delete();
+        } else {
+            $student->status = 'active';
+        }
+
+        $student->save();
+
+        return back()->with('success', 'Course and related skills successfully added!');
     }
 
-    $student->save();
 
-    return back()->with('success', 'Course and related skills successfully added!');
+    public function uploadLesen(Request $request)
+{
+    // Check if the form is being submitted and the data is being received
+    // dd($request->all());
+
+    $request->validate([
+        'lesen_picture' => 'required|mimes:jpeg,png,jpg,gif,pdf|max:2048',
+        'lesen_picture_date' => 'required|date',
+    ]);
+
+    // Check if validation passes
+    // dd('Validation passed');
+
+    $student = Auth::guard('student')->user();
+
+    if ($request->hasFile('lesen_picture')) {
+        // Check if the file is being received correctly
+        // dd('File received', $request->file('lesen_picture'));
+
+        // Save the file to the public storage directory
+        $fileName = time() . '.' . $request->lesen_picture->getClientOriginalExtension();
+        $filePath = $request->lesen_picture->storeAs('public/lesen_picture', $fileName);
+
+        $student->lesen_picture = $fileName;
+        $student->lesen_picture_date = $request->lesen_picture_date;
+        $student->lesen_picture_status = 'pending';
+        $student->save();
+
+        // Check if the student data is being saved correctly
+        // dd('Student data saved', $student);
+    }
+
+    return redirect()->back()->with('success', 'Lesen picture and date uploaded successfully.');
 }
+
 
 }

@@ -15,9 +15,33 @@ class HomeController extends Controller
 {
     public function index()
     {
-        return view('admin.homepage');
-    }
+        $pendingApprovals = Student::where('lesen_picture_status', 'pending')->get();
 
+        return view('admin.homepage', compact('pendingApprovals'));
+    }
+    public function handleApproval(Request $request, $id)
+    {
+        $student = Student::findOrFail($id);
+
+        if ($request->input('action') == 'approve') {
+            $student->lesen_picture_status = 'approved';
+            $student->status = 'active';
+        } else {
+            // Remove the file
+            if (Storage::exists('public/lesen_picture/' . $student->lesen_picture)) {
+                Storage::delete('public/lesen_picture/' . $student->lesen_picture);
+            }
+
+            $student->lesen_picture_status = 'rejected';
+            $student->status = 'inactive';
+            $student->lesen_picture = null;
+            $student->lesen_picture_date = null;
+        }
+
+        $student->save();
+
+        return back()->with('status', 'Student status updated successfully.');
+    }
     public function student()
     {
         $students = Student::with('courses')->get();

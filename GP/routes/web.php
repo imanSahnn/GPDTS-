@@ -39,7 +39,7 @@ Route::get('/admin/tutors/pending', [HomeController::class, 'pendingTutors'])->n
 Route::post('/admin/tutors/approve/{id}', [HomeController::class, 'approveTutor'])->name('admin.tutors.approve');
 Route::post('/admin/tutors/reject/{id}', [HomeController::class, 'rejectTutor'])->name('admin.tutors.reject');
 Route::put('/admin/toggle-status/{id}', [StudentController::class, 'toggleStatus'])->name('admin.toggleStatus');
-
+Route::put('/admin/approve/{id}', [HomeController::class, 'handleApproval'])->name('admin.approve');
 
 //reprot
 Route::get('/reports', [ReportController::class, 'index'])->name('report.index');
@@ -109,6 +109,12 @@ Route::group(['middleware' => ['auth:student']], function () {
     Route::get('/student/profile', [StudentController::class, 'showProfile'])->name('student.profile');
     Route::post('/student/profile', [StudentController::class, 'updateProfile'])->name('student.profile.update');
 });
+
+Route::post('/upload-computer-test-result', [StudentController::class, 'uploadComputerTestResult'])->name('student.uploadComputerTestResult');
+Route::post('/admin/approve-computer-test/{studentId}', [HomeController::class, 'approveComputerTest'])->name('admin.approveComputerTest');
+Route::post('/admin/reject-computer-test/{studentId}', [HomeController::class, 'rejectComputerTest'])->name('admin.rejectComputerTest');
+
+Route::post('/uploadLesen', [StudentController::class, 'uploadLesen'])->name('uploadLesen');
 
 
 Route::get('/sregister', [AuthController::class, 'sregister'])->name('sregister'); //untuk get the data from field
