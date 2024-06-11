@@ -45,8 +45,10 @@ Route::get('/admin/approve-uploads', [HomeController::class, 'index'])->name('ad
 // Route to handle the approval action
 Route::put('/admin/approve/{id}', [HomeController::class, 'handleApproval'])->name('admin.approve');
 //reprot
-Route::get('/reports', [ReportController::class, 'index'])->name('report.index');
-Route::post('/reports/generate', [ReportController::class, 'generateReport'])->name('admin.reportresult');
+Route::get('/admin/reports', [ReportController::class, 'showReportForm'])->name('admin.showReportForm');
+Route::post('/admin/reports/students', [ReportController::class, 'generateStudentReport'])->name('admin.generateStudentReport');
+Route::post('/admin/reports/tutors', [ReportController::class, 'generateTutorReport'])->name('admin.generateTutorReport');
+Route::post('/admin/reports/courses', [ReportController::class, 'generateCourseReport'])->name('admin.generateCourseReport');
 
 
 

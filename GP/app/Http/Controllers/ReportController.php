@@ -3,64 +3,62 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Booking;
-use App\Models\Course;
-use App\Models\FinalAssessment;
-use App\Models\Payment;
-use App\Models\Rating;
 use App\Models\Student;
 use App\Models\Tutor;
+use App\Models\Course;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function showReportForm()
     {
-        return view('admin.report');
+        $students = Student::all();
+        $tutors = Tutor::all();
+        $courses = Course::all();
+        return view('admin.report_form', compact('students', 'tutors', 'courses'));
     }
 
-    public function generateReport(Request $request)
+    public function generateStudentReport(Request $request)
     {
-        $reportType = $request->input('report_type');
-        $data = [];
+        $courseId = $request->input('course_id');
+        $tutorId = $request->input('tutor_id');
+        $query = Student::query();
 
-        switch ($reportType) {
-            case 'bookings':
-                $query = Booking::with(['student', 'tutor', 'course']);
-                break;
-            case 'payments':
-                $query = Payment::with(['student', 'course']);
-                break;
-            case 'final_assessments':
-                $query = FinalAssessment::with(['student', 'course']);
-                break;
-            case 'ratings':
-                $query = Rating::with(['student', 'tutor', 'course']);
-                break;
-            case 'students':
-                $query = Student::with(['courses', 'bookings', 'payments']);
-                break;
-            case 'tutors':
-                $query = Tutor::with(['course', 'bookings', 'ratings']);
-                break;
-            default:
-                return redirect()->back()->with('error', 'Invalid report type selected.');
+        if ($courseId) {
+            $query->whereHas('courses', function ($q) use ($courseId) {
+                $q->where('course_id', $courseId);
+            });
         }
 
-        // Apply filters if any
-        if ($request->filled('filter_by') && $request->filled('filter_value')) {
-            $filterBy = $request->input('filter_by');
-            $filterValue = $request->input('filter_value');
-            $query->where($filterBy, $filterValue);
+        if ($tutorId) {
+            $query->whereHas('bookings', function ($q) use ($tutorId) {
+                $q->where('tutor_id', $tutorId);
+            });
         }
 
-        if ($request->filled('sort_by')) {
-            $sortBy = $request->input('sort_by');
-            $sortOrder = $request->input('sort_order', 'asc');
-            $query->orderBy($sortBy, $sortOrder);
+        $students = $query->get();
+        return view('admin.student_report', compact('students'));
+    }
+
+    public function generateTutorReport(Request $request)
+    {
+        $courseId = $request->input('course_id');
+        $query = Tutor::query();
+
+        if ($courseId) {
+            $query->where('course_id', $courseId);
         }
 
-        $data = $query->get();
+        $tutors = $query->get();
+        return view('admin.tutor_report', compact('tutors'));
+    }
 
-        return view('admin.reportresult', compact('data', 'reportType'));
+    public function generateCourseReport(Request $request)
+    {
+        $courseId = $request->input('course_id');
+        $courses = Course::when($courseId, function ($query, $courseId) {
+            return $query->where('id', $courseId);
+        })->get();
+        return view('admin.course_report', compact('courses'));
     }
 }
+

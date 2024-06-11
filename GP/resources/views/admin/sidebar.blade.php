@@ -36,47 +36,48 @@
     }
 </style>
 
-<div class="sidebar">
-    <ul>
-        <li class="nav-item">
-            <a href="{{ route('homepage') }}" class="nav-link {{ request()->is('homepage') ? 'active' : '' }}">
-                <i class="bi bi-house-fill"></i> <span>Home</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('student') }}" class="nav-link {{ request()->is('student') ? 'active' : '' }}">
-                <i class="bi bi-person-fill"></i> <span>Student</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('tutor') }}" class="nav-link {{ request()->is('tutor') ? 'active' : '' }}">
-                <i class="bi bi-person-badge-fill"></i> <span>Tutor</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('course') }}" class="nav-link {{ request()->is('course') ? 'active' : '' }}">
-                <i class="bi bi-book-half"></i> <span>Course</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('show_confirm_payment') }}" class="nav-link {{ request()->is('payment') ? 'active' : '' }}">
-                <i class="bi bi-cash-stack"></i> <span>Payment</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('pendingTutors') }}" class="nav-link {{ request()->is('pendingTutors') ? 'active' : '' }}">
-                <i class="bi bi-hourglass-split"></i> <span>Pending</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('report.index') }}" class="nav-link {{ request()->is('admin/reports') ? 'active' : '' }}">
-                <i class="bi bi-file-earmark-text-fill"></i> <span>Report</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('admin.jpj') }}" class="nav-link {{ request()->is('/admin/jpj') ? 'active' : '' }}">
-                <i class="bi bi-calendar-range-fill"></i> <span>JPJ Test</span>
-            </a>
-        </li>
-    </ul>
-</div>
+<div class="flex">
+    <div class="sidebar">
+        <ul>
+            <li class="nav-item">
+                <a href="{{ route('homepage') }}" class="nav-link {{ request()->is('homepage') ? 'active' : '' }}">
+                    <i class="bi bi-house-fill"></i> <span>Home</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('student') }}" class="nav-link {{ request()->is('student') ? 'active' : '' }}">
+                    <i class="bi bi-person-fill"></i> <span>Student</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('tutor') }}" class="nav-link {{ request()->is('tutor') ? 'active' : '' }}">
+                    <i class="bi bi-person-badge-fill"></i> <span>Tutor</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('course') }}" class="nav-link {{ request()->is('course') ? 'active' : '' }}">
+                    <i class="bi bi-book-half"></i> <span>Course</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('show_confirm_payment') }}" class="nav-link {{ request()->is('payment') ? 'active' : '' }}">
+                    <i class="bi bi-cash-stack"></i> <span>Payment</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('pendingTutors') }}" class="nav-link {{ request()->is('pendingTutors') ? 'active' : '' }}">
+                    <i class="bi bi-hourglass-split"></i> <span>Pending</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.showReportForm') }}" class="nav-link {{ request()->is('admin/reports') ? 'active' : '' }}">
+                    <i class="bi bi-file-earmark-text-fill"></i> <span>Report</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.jpj') }}" class="nav-link {{ request()->is('admin/jpj') ? 'active' : '' }}">
+                    <i class="bi bi-calendar-range-fill"></i> <span>JPJ Test</span>
+                </a>
+            </li>
+        </ul>
+    </div>
