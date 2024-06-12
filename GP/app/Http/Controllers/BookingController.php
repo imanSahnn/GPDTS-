@@ -329,7 +329,7 @@ class BookingController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Final assessment booked successfully.']);
     }
-S
+
 
 
     public function submitFinalAssessment(Request $request)
