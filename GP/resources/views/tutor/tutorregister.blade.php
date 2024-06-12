@@ -15,7 +15,7 @@
         <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-lg xl:p-0 mx-4 md:mx-auto">
             <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                 <div class="flex justify-center items-center">
-                    <img src="{{ Storage::url('public/adminpage/gplogo.png') }}" alt="Gentian Padu Driving School Logo" class="h-12 w-12 mr-2">
+
                     <h1 class="text-2xl font-bold leading-tight tracking-tight text-gray-900 md:text-3xl text-center">
                         Gentian Padu Driving School
                     </h1>

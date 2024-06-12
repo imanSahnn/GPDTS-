@@ -80,7 +80,8 @@ class BookingController extends Controller
             }
         }
 
-        return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses', 'coursePaymentStatus', 'canTakeFinal', 'selectedCourseId', 'eligibleCourses', 'finalAssessment', 'penaltyPayment', 'user'));
+        return view('student.booking', compact('tutors', 'profilePicture', 'hasTutor', 'bookings', 'chosenCourses',
+        'coursePaymentStatus', 'canTakeFinal', 'selectedCourseId', 'eligibleCourses', 'finalAssessment', 'penaltyPayment', 'user'));
     }
 
 
@@ -328,7 +329,7 @@ class BookingController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Final assessment booked successfully.']);
     }
-
+S
 
 
     public function submitFinalAssessment(Request $request)

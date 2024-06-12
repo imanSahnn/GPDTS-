@@ -24,27 +24,40 @@
         </div>
     @endif
 
-    <div class="container mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Course Selection Section -->
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold mb-4">Course Selection</h2>
-            <form id="courseSelectionForm">
-                <label for="course_id" class="block text-gray-700 text-sm font-bold mb-2">Choose Course:</label>
-                <select name="course_id" id="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                    <option value="">Select a Course</option>
-                    @foreach($courses as $course)
-                        <option value="{{ $course->id }}" data-price="{{ $course->price }}" data-paid="{{ $course->payments->where('status', 'approved')->sum('total_payment') }}">{{ $course->name }}</option>
-                    @endforeach
-                </select>
-                <div class="mt-4">
-                    <p class="text-lg"><strong>Total Course Price: </strong><span id="totalCoursePrice">-</span></p>
-                    <p class="text-lg"><strong>Total Paid: </strong><span id="totalPaid">-</span></p>
+    <!-- Course Selection Section -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+        <h2 class="text-2xl font-bold mb-4">Course Selection</h2>
+        <form id="courseSelectionForm">
+            <label for="course_id" class="block text-gray-700 text-sm font-bold mb-2">Choose Course:</label>
+            <select name="course_id" id="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <option value="">Select a Course</option>
+                @foreach($courses as $course)
+                    <option value="{{ $course->id }}" data-price="{{ $course->price }}" data-paid="{{ $course->payments->where('status', 'approved')->sum('total_payment') }}">{{ $course->name }}</option>
+                @endforeach
+            </select>
+            <div class="mt-4">
+                <p class="text-lg"><strong>Total Course Price: </strong><span id="totalCoursePrice">-</span></p>
+                <p class="text-lg"><strong>Total Paid: </strong><span id="totalPaid">-</span></p>
+            </div>
+        </form>
+    </div>
+
+    <div class="container mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Payment Information Section -->
+        <div class="bg-white p-6 rounded-lg shadow-lg md:col-span-1">
+            <h2 class="text-2xl font-bold mb-4">Payment Information</h2>
+            <div class="flex flex-col items-center">
+                <img src="{{ asset('storage/jpj/qrcode.jpg') }}"  alt="QR Code" class="w-34 h-33 mb-3">
+                <div>
+                    <p class="text-lg"><strong>Bank Name:</strong>Bank Muamalat</p>
+                    <p class="text-lg"><strong>Account Number:</strong> 1234567890</p>
+                    <p class="text-lg"><strong>Account Name:</strong> Gentian Padu</p>
                 </div>
-            </form>
+            </div>
         </div>
 
         <!-- Payment Form Section -->
-        <div class="bg-white p-6 rounded-lg shadow-lg">
+        <div class="bg-white p-6 rounded-lg shadow-lg md:col-span-2">
             <h2 class="text-2xl font-bold mb-4">Payment Form</h2>
             <form action="{{ route('submit_payment') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -77,7 +90,6 @@
             </form>
         </div>
     </div>
-</div>
 
     <!-- Past Payments and Invoice Section -->
     <div class="bg-white p-6 rounded-lg shadow-lg mt-8">

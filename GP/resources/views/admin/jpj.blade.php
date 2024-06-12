@@ -16,7 +16,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(255, 0, 0, 0.71);
             padding-top: 60px;
         }
         .modal-content {
@@ -35,7 +35,7 @@
         }
         .close:hover,
         .close:focus {
-            color: black;
+            color: rgb(255, 0, 0);
             text-decoration: none;
             cursor: pointer;
         }

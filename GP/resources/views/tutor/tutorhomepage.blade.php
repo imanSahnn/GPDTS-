@@ -28,9 +28,18 @@
     @extends('tutor.layout')
 
     @section('title', 'Homepage')
-
     @section('content')
-    <div id="clock" class="text-6xl font-bold text-center"></div>
+    <script>
+        function updateClock() {
+            const options = { timeZone: 'Asia/Kuala_Lumpur', hour12: true, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const now = new Date().toLocaleString('en-US', options);
+            document.getElementById('clock').innerText = now;
+        }
+
+        setInterval(updateClock, 1000);
+        document.addEventListener('DOMContentLoaded', updateClock);
+    </script>
+    <div id="clock" class="text-6xl font-bold text-center mb-6"></div>
     <div class="max-w-md w-full mx-auto">
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="booking-card">

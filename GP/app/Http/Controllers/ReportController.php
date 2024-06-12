@@ -3,62 +3,63 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Student;
-use App\Models\Tutor;
 use App\Models\Course;
+use App\Models\Tutor;
+use App\Models\Booking;
+use App\Models\Rating;
 
 class ReportController extends Controller
 {
     public function showReportForm()
     {
-        $students = Student::all();
-        $tutors = Tutor::all();
-        $courses = Course::all();
-        return view('admin.report_form', compact('students', 'tutors', 'courses'));
+        return view('admin.report_form');
     }
 
-    public function generateStudentReport(Request $request)
+    public function popularityOfCourses()
     {
-        $courseId = $request->input('course_id');
-        $tutorId = $request->input('tutor_id');
-        $query = Student::query();
-
-        if ($courseId) {
-            $query->whereHas('courses', function ($q) use ($courseId) {
-                $q->where('course_id', $courseId);
-            });
-        }
-
-        if ($tutorId) {
-            $query->whereHas('bookings', function ($q) use ($tutorId) {
-                $q->where('tutor_id', $tutorId);
-            });
-        }
-
-        $students = $query->get();
-        return view('admin.student_report', compact('students'));
+        $courses = Course::withCount('bookings')
+                         ->orderBy('bookings_count', 'desc')
+                         ->get();
+        return view('admin.popularity_of_courses', compact('courses'));
     }
 
-    public function generateTutorReport(Request $request)
+    public function highestPaidCourse()
     {
-        $courseId = $request->input('course_id');
-        $query = Tutor::query();
-
-        if ($courseId) {
-            $query->where('course_id', $courseId);
-        }
-
-        $tutors = $query->get();
-        return view('admin.tutor_report', compact('tutors'));
+        $courses = Course::withSum('payments', 'total_payment')
+                         ->orderBy('payments_sum_total_payment', 'desc')
+                         ->get();
+        return view('admin.highest_paid_course', compact('courses'));
     }
 
-    public function generateCourseReport(Request $request)
+    public function mostPopularTutor()
     {
-        $courseId = $request->input('course_id');
-        $courses = Course::when($courseId, function ($query, $courseId) {
-            return $query->where('id', $courseId);
-        })->get();
-        return view('admin.course_report', compact('courses'));
+        $tutors = Tutor::withCount('bookings')
+                       ->orderBy('bookings_count', 'desc')
+                       ->get();
+        return view('admin.most_popular_tutor', compact('tutors'));
+    }
+
+    public function ratingOfTutors()
+    {
+        $tutors = Tutor::with('ratings')
+                       ->withAvg('ratings', 'rate')
+                       ->get();
+        return view('admin.rating_of_tutors', compact('tutors'));
+    }
+
+    public function commentsForTutors()
+    {
+        $tutors = Tutor::with('ratings')
+                       ->get();
+        return view('admin.comments_for_tutors', compact('tutors'));
+    }
+
+    public function mostBookedTime()
+    {
+        $bookings = Booking::selectRaw('time, COUNT(*) as count')
+                           ->groupBy('time')
+                           ->orderBy('count', 'desc')
+                           ->get();
+        return view('admin.most_booked_time', compact('bookings'));
     }
 }
-

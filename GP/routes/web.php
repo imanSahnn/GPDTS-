@@ -45,10 +45,15 @@ Route::get('/admin/approve-uploads', [HomeController::class, 'index'])->name('ad
 // Route to handle the approval action
 Route::put('/admin/approve/{id}', [HomeController::class, 'handleApproval'])->name('admin.approve');
 //reprot
-Route::get('/admin/reports', [ReportController::class, 'showReportForm'])->name('admin.showReportForm');
-Route::post('/admin/reports/students', [ReportController::class, 'generateStudentReport'])->name('admin.generateStudentReport');
-Route::post('/admin/reports/tutors', [ReportController::class, 'generateTutorReport'])->name('admin.generateTutorReport');
-Route::post('/admin/reports/courses', [ReportController::class, 'generateCourseReport'])->name('admin.generateCourseReport');
+
+Route::get('/report/form', [ReportController::class, 'showReportForm'])->name('admin.showReportForm');
+
+Route::get('/report/popularity-of-courses', [ReportController::class, 'popularityOfCourses'])->name('admin.popularityOfCourses');
+Route::get('/report/highest-paid-course', [ReportController::class, 'highestPaidCourse'])->name('admin.highestPaidCourse');
+Route::get('/report/most-popular-tutor', [ReportController::class, 'mostPopularTutor'])->name('admin.mostPopularTutor');
+Route::get('/report/rating-of-tutors', [ReportController::class, 'ratingOfTutors'])->name('admin.ratingOfTutors');
+Route::get('/report/comments-for-tutors', [ReportController::class, 'commentsForTutors'])->name('admin.commentsForTutors');
+Route::get('/report/most-booked-time', [ReportController::class, 'mostBookedTime'])->name('admin.mostBookedTime');
 
 
 

@@ -20,6 +20,18 @@
                 <label class="block text-gray-700 font-bold text-xl mb-2">Status:</label>
                 <span class="text-lg">{{ $student->status }}</span>
             </div>
+            @if($student->picture)
+            <div class="mb-4 flex justify-center">
+                <div>
+                    <label class="block text-gray-700 text-center font-bold mb-1">Current Profile Picture:</label>
+                    <img src="{{ asset('storage/' . $student->picture) }}" alt="Profile Picture" class="rounded-full w-32 h-32">
+                </div>
+            </div>
+        @endif
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="picture">Profile Picture:</label>
+                <input type="file" id="picture" name="picture" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
 
             <div class="mb-4">
                 <label class="block text-gray-700 font-bold mb-2" for="name">Name:</label>
@@ -51,17 +63,6 @@
                 <input type="password" id="password_confirmation" name="password_confirmation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 font-bold mb-2" for="picture">Profile Picture:</label>
-                <input type="file" id="picture" name="picture" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </div>
-
-            @if($student->picture)
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-bold mb-2">Current Profile Picture:</label>
-                    <img src="{{ asset('storage/' . $student->picture) }}" alt="Profile Picture" class="rounded-full w-32 h-32">
-                </div>
-            @endif
 
             <div class="mb-4">
                 <label class="block text-gray-700 font-bold mb-2">Courses:</label>
